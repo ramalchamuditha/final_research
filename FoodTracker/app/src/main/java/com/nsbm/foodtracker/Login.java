@@ -1,7 +1,10 @@
 package com.nsbm.foodtracker;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -18,8 +21,14 @@ public class Login extends AppCompatActivity {
         SignInButton signInButton = findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
 
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent newIntent = new Intent(Login.this,OCR_Activity.class);
+                startActivity(newIntent);
 
-
+            }
+        });
 
     }
 }
