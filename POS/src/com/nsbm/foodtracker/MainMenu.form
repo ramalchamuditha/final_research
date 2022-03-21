@@ -91,11 +91,14 @@
     </Component>
     <Component class="javax.swing.JButton" name="btn_addItems">
       <Properties>
-        <Property name="text" type="java.lang.String" value="ADD ITEMS"/>
+        <Property name="text" type="java.lang.String" value="ADD PRODUCTS"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[123, 25]"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_addItemsActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

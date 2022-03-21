@@ -4,7 +4,10 @@
  * and open the template in the editor.
  */
 package com.nsbm.foodtracker;
-
+import java.io.File;
+  
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
 /**
  *
  * @author Chamuditha
@@ -49,8 +52,13 @@ public class MainMenu extends javax.swing.JFrame {
 
         btn_view.setText("VIEW RECORDS");
 
-        btn_addItems.setText("ADD ITEMS");
+        btn_addItems.setText("ADD PRODUCTS");
         btn_addItems.setPreferredSize(new java.awt.Dimension(123, 25));
+        btn_addItems.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_addItemsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -88,7 +96,27 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
         // TODO add your handling code here:
+        Tesseract tesseract = new Tesseract();
+        try {
+  
+            tesseract.setDatapath("C:\\Users\\Chamuditha\\Documents\\GitHub\\final_research\\POS\\Tess4J-3.4.8-src\\Tess4J\\tessdata");
+  
+            // the path of your tess data folder
+            // inside the extracted file
+            String text
+                = tesseract.doOCR(new File("C:\\Users\\Chamuditha\\Downloads\\number.png"));
+  
+            // path of your image file
+            System.out.print(text);
+        }
+        catch (TesseractException e) {
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_btn_addActionPerformed
+
+    private void btn_addItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addItemsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_addItemsActionPerformed
 
     /**
      * @param args the command line arguments
