@@ -24,6 +24,8 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -36,7 +38,7 @@ public class OCR_Activity extends AppCompatActivity{
     Button btnCapture,btncopy;
     TextView viewText;
     ImageView imageView;
-    String result = null;
+    DatabaseReference mDatabase;
     Bitmap imageBitmap;
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -123,6 +125,9 @@ public class OCR_Activity extends AppCompatActivity{
                             result.append(elementText);
                         }
                         viewText.setText(blockText);
+                        mDatabase = FirebaseDatabase.getInstance().getReference();
+                        mDatabase.child("id").child("itemName").setValue(blockText);
+
                     }
                 }
             }

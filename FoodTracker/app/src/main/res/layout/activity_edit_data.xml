@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".EditData">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/item_name"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:padding="10dp"/>
+
+    <EditText
+        android:id="@+id/updateName"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:padding="15dp"
+        android:inputType="text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/expire_date"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:padding="10dp"/>
+
+    <EditText
+        android:id="@+id/updateEXp"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:padding="15dp"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btn_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/update"
+        android:padding="10dp"/>
+
+
+</LinearLayout>
