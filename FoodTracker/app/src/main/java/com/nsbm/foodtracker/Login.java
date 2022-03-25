@@ -38,6 +38,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -63,6 +64,9 @@ public class Login extends AppCompatActivity {
     SignInButton signInButton;
     GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
+    Users users;
 
 
     @Override
@@ -81,7 +85,13 @@ public class Login extends AppCompatActivity {
         forgot = findViewById(R.id.txtForgot);
 
         callbackManager = CallbackManager.Factory.create();
-        loginButton.setPermissions(Arrays.asList("email","public_profile"));
+        loginButton.setPermissions(Arrays.asList("public_profile"));
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if(accessToken!=null && !accessToken.isExpired())
+        {
+            startActivity(new Intent(Login.this,MainActivity.class));
+        }
 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -91,6 +101,9 @@ public class Login extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
         mAuth = FirebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("Users");
+        users= new Users();
 
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,9 +179,6 @@ public class Login extends AppCompatActivity {
                         }
                     });
                 }
-
-
-
             }
         });
 
@@ -184,11 +194,10 @@ public class Login extends AppCompatActivity {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                NameText.setText("User Id : "+loginResult.getAccessToken().getUserId());
-                String image_url = "https://graph.facebook.com/"+loginResult.getAccessToken().getUserId()+"/picture?type=large";
-                Glide.with(Login.this).load(image_url).into(ProfileImg);
 
-                //String imageURL = "https://graph.facebook.com/"+loginResult.getAccessToken().getUserId()+"/picture?return_ssl_resources=1";
+                Log.d(TAG, "facebook:onSuccess:" + loginResult);
+                handleFacebookAccessToken(loginResult.getAccessToken());
+
             }
 
             @Override
@@ -214,7 +223,6 @@ public class Login extends AppCompatActivity {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
-                String userID = account.getId();
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
@@ -244,7 +252,7 @@ public class Login extends AppCompatActivity {
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        Toast.makeText(Login.this, "credentials :"+credential, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(Login.this, "credentials :"+credential, Toast.LENGTH_SHORT).show();
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -280,13 +288,13 @@ public class Login extends AppCompatActivity {
     AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
         @Override
         protected void onCurrentAccessTokenChanged(@Nullable AccessToken accessToken, @Nullable AccessToken accessToken1) {
-            if(accessToken ==null)
+            if(accessToken1 ==null)
             {
                 Toast.makeText(Login.this, "Logout", Toast.LENGTH_SHORT).show();
             }
             else
             {
-                loadUserProfile(accessToken);
+                loadUserProfile(accessToken1);
             }
 
         }
@@ -296,13 +304,13 @@ public class Login extends AppCompatActivity {
     {
         GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
             @Override
-            public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
+            public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
                 try {
                     String first_name = jsonObject.getString("first_name");
                     String last_name = jsonObject.getString("last_name");
-                    String email = jsonObject.getString("email");
+                    String userEmail = jsonObject.getString("email");
                     String id = jsonObject.getString("id");
-                    String image_url = "https://graph.facebook.com/"+id+"/picture?type=normal";
+                    String image_url = jsonObject.getJSONObject("picture").getJSONObject("data").getString("url");
 
                     NameText.setText(first_name +" "+ last_name);
                     RequestOptions requestOptions = new RequestOptions();
@@ -310,19 +318,41 @@ public class Login extends AppCompatActivity {
 
                     Glide.with(Login.this).load(image_url).into(ProfileImg);
 
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
 
             }
         });
 
         Bundle parameter = new Bundle();
-        parameter.putString("fields","first_name,last_name,id");
+        parameter.putString("fields","first_name,last_name,email,id,link,picture.type(large)");
         request.setParameters(parameter);
         request.executeAsync();
+    }
+
+    private void handleFacebookAccessToken(AccessToken token) {
+        Log.d(TAG, "handleFacebookAccessToken:" + token);
+
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "signInWithCredential:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            Toast.makeText(Login.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
+                    }
+                });
+
     }
 
 }

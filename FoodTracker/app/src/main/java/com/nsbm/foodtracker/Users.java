@@ -11,6 +11,15 @@ public class Users {
     public Users() {
     }
 
+    public Users(String userName, String userEmail, String userID, String userPhone, String loginPassword, String userProfile) {
+        this.userName = userName;
+        this.userEmail = userEmail;
+        this.userID = userID;
+        this.userPhone = userPhone;
+        this.loginPassword = loginPassword;
+        this.userProfile = userProfile;
+    }
+
     public String getUserName() {
         return userName;
     }

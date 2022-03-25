@@ -38,7 +38,7 @@ public class SignUpActivity extends AppCompatActivity {
         rePassword = findViewById(R.id.pass_re_text);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        databaseReference = firebaseDatabase.getReference("Items");
+        databaseReference = firebaseDatabase.getReference("Users");
 
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,6 +80,7 @@ public class SignUpActivity extends AppCompatActivity {
                     String UID = firebaseAuth.getUid();
                     users.setUserEmail(userEmail);
                     users.setLoginPassword(userPWD);
+                    users.setUserID(UID);
 
                     databaseReference.child(UID).setValue(users);
                 }

@@ -1,6 +1,7 @@
 package com.nsbm.foodtracker;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +22,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -30,7 +37,12 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -41,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ImageView userIMG;
     TextView profileName,profileEmail;
     GoogleSignInClient mGoogleSignInClient;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
+    Users users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +64,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("Users");
+        users = new Users();
 
         AddRecord = findViewById(R.id.btn_addRecord);
         viewRecords = findViewById(R.id.btn_viewData);
@@ -147,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_logout:
                 mAuth.signOut();
+                LoginManager.getInstance().logOut();
                 Toast.makeText(MainActivity.this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(MainActivity.this,Login.class));
                 break;
@@ -198,8 +218,58 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStart() {
         super.onStart();
         viewProfile();
+        addFBAccount();
+        AddGAccount();
+    }
+
+    private void AddGAccount() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getBaseContext());
+        if (account != null)
+        {
+            users.setUserEmail(account.getEmail());
+            users.setUserID(account.getId());
+            users.setUserName(account.getDisplayName());
+            users.setUserProfile(account.getPhotoUrl().toString());
+
+            databaseReference.child(mAuth.getUid()).setValue(users);
+        }
+    }
+
+    private void addFBAccount() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if(accessToken!=null)
+        {
+            GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+                @Override
+                public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
+                    try {
+                        String first_name = jsonObject.getString("first_name");
+                        String last_name = jsonObject.getString("last_name");
+                        String userEmail = jsonObject.getString("email");
+                        String id = jsonObject.getString("id");
+                        String image_url = jsonObject.getJSONObject("picture").getJSONObject("data").getString("url");
+
+                        String UID = mAuth.getUid();
+                        users.setUserEmail(userEmail);
+                        users.setUserID(id);
+                        users.setUserName(first_name + " " + last_name);
+                        users.setUserProfile(image_url);
+                        databaseReference.child(UID).setValue(users);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+            Bundle parameter = new Bundle();
+            parameter.putString("fields", "first_name,last_name,email,id,link,picture.type(large)");
+            request.setParameters(parameter);
+            request.executeAsync();
+        }
 
     }
+
 
     private void viewProfile(){
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getBaseContext());
@@ -207,6 +277,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             profileName.setText(acct.getDisplayName());
             profileEmail.setText(acct.getEmail());
             Picasso.get().load(acct.getPhotoUrl()).placeholder(R.mipmap.ic_launcher).into(userIMG);
+        }
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+
+        if(accessToken!=null)
+        {
+            GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+                @Override
+                public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
+                    try {
+                        String first_name = jsonObject.getString("first_name");
+                        String last_name = jsonObject.getString("last_name");
+                        String userEmail = jsonObject.getString("email");
+                        String id = jsonObject.getString("id");
+                        String image_url = jsonObject.getJSONObject("picture").getJSONObject("data").getString("url");
+
+                        profileName.setText(first_name +" "+ last_name);
+                        profileEmail.setText(userEmail);
+                        RequestOptions requestOptions = new RequestOptions();
+                        requestOptions.dontAnimate();
+
+                        Glide.with(MainActivity.this).load(image_url).into(userIMG);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+            Bundle parameter = new Bundle();
+            parameter.putString("fields","first_name,last_name,email,id,link,picture.type(large)");
+            request.setParameters(parameter);
+            request.executeAsync();
         }
 
     }
