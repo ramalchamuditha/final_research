@@ -23,8 +23,8 @@ public class SignUpActivity extends AppCompatActivity {
     EditText email, password, rePassword;
     Button signUp;
     FirebaseAuth firebaseAuth;
-    FirebaseDatabase firebaseDatabase;
-    DatabaseReference databaseReference;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
     Users users;
 
     @Override
@@ -38,7 +38,9 @@ public class SignUpActivity extends AppCompatActivity {
         rePassword = findViewById(R.id.pass_re_text);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("Users");
+        users = new Users();
 
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,106 +28,94 @@
             android:layout_toRightOf="@id/profileImage"
             android:fontFamily="@font/bungee"
             android:includeFontPadding="false"
-            android:text="User Name"
+            android:text="New User"
             android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/profilePicChange"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profileUserName"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="12dp"
-            android:layout_toRightOf="@id/profileImage"
-            android:includeFontPadding="false"
-            android:text="Change profile Picture"
-            android:textSize="14sp" />
 
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="15dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Full Name"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:hint="Full Name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/UPName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/ic_person"
-                android:drawablePadding="10dp"
-                android:text="UserName here"/>
+                android:drawablePadding="10dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="E-Mail"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:hint="E-Mail">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/UPEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
                 android:drawableLeft="@drawable/ic_email"
-                android:text="Email here"/>
+                android:drawablePadding="10dp"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Phone Number"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:hint="Phone Number">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/UPPhoneNo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
                 android:drawableLeft="@drawable/ic_phone"
-                android:text="Phone number here"/>
+                android:drawablePadding="10dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/UPPasswordLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password Name"
-            android:layout_marginBottom="10dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/UPPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
-                android:inputType="textPassword"
-                android:drawableLeft="@drawable/ic_login"
-                android:text="Password here"/>
-            
-
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <Button
-            android:id="@+id/btn_UPUpdate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Update"
-            android:fontFamily="@font/bungee"
-            android:background="#98c35c"/>
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_UPUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/bungee"
+        android:onClick="uploadImage"
+        android:text="@string/update"
+        tools:ignore="UsingOnClickInXml" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="-- OR --"
+        android:includeFontPadding="true"
+        android:textAlignment="center"/>
+    <Button
+        android:id="@+id/NewPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Change Password"/>
+
+    <Button
+        android:id="@+id/PicChange"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="selectImage"
+        android:text="@string/change_profile_picture"
+        tools:ignore="UsingOnClickInXml" />
+
 
 </LinearLayout>
