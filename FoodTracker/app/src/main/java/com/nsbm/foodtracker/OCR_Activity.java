@@ -8,11 +8,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -41,6 +43,8 @@ public class OCR_Activity extends AppCompatActivity{
     DatabaseReference mDatabase;
     Bitmap imageBitmap;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    final int PIC_CROP = 2;
+    private Uri picUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +73,7 @@ public class OCR_Activity extends AppCompatActivity{
                 }
                 else
                 {
-                    requsetPermission();
+                    requestPermission();
                 }
             }
         });
@@ -83,7 +87,7 @@ public class OCR_Activity extends AppCompatActivity{
         return cameraPermission == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void requsetPermission()
+    private void requestPermission()
     {
         int permission_code = 200;
         ActivityCompat.requestPermissions(OCR_Activity.this,new String[]{Manifest.permission.CAMERA}, permission_code);
@@ -158,11 +162,48 @@ public class OCR_Activity extends AppCompatActivity{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
+        if(resultCode == RESULT_OK)
         {
-            Bundle extras = data.getExtras();
-            imageBitmap = (Bitmap) extras.get("data");
-            imageView.setImageBitmap(imageBitmap);
+            if(requestCode == REQUEST_IMAGE_CAPTURE)
+            {
+                picUri = data.getData();
+                performCrop();
+            }
+            else if(requestCode == PIC_CROP)
+            {
+                Bundle extras = data.getExtras();
+                imageBitmap = (Bitmap) extras.get("data");
+                performCrop();
+                imageView.setImageBitmap(imageBitmap);
+            }
+
+        }
+    }
+
+    private void performCrop() {
+        try {
+            Intent cropIntent = new Intent("com.android.camera.action.CROP");
+            //indicate image type and Uri
+            cropIntent.setDataAndType(picUri, "image/*");
+            //set crop properties
+            cropIntent.putExtra("crop", "true");
+            //indicate aspect of desired crop
+            cropIntent.putExtra("aspectX", 1);
+            cropIntent.putExtra("aspectY", 1);
+            //indicate output X and Y
+            cropIntent.putExtra("outputX", 256);
+            cropIntent.putExtra("outputY", 256);
+            //retrieve data on return
+            cropIntent.putExtra("return-data", true);
+            //start the activity - we handle returning in onActivityResult
+            startActivityForResult(cropIntent, PIC_CROP);
+
+        }
+        catch(ActivityNotFoundException anfe){
+            //display an error message
+            String errorMessage = "Whoops - your device doesn't support the crop action!";
+            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 

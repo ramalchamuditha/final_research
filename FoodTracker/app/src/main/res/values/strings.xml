@@ -34,5 +34,6 @@
     <string name="email">Email</string>
     <string name="server_client_id">695910435495-05b843gp423ape6fmd6cq8i2fmhn1i56.apps.googleusercontent.com</string>
     <string name="change_profile_picture">Change profile Picture</string>
+    <string name="change_password">Change Password</string>
 
 </resources>

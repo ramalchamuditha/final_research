@@ -2,17 +2,22 @@ package com.nsbm.foodtracker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,14 +25,19 @@ import android.widget.Toast;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -43,14 +53,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class UserProfile extends AppCompatActivity {
+public class UserProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     GoogleSignInClient mGoogleSignInClient;
-    EditText userName,userEmail,userPhone,userPassword;
+    TextInputEditText userName1,userEmail1,userPhone1;
     Button btnUpdate,profilePic,btnPassword;
-    ImageView profile;
+    ImageView profile,userIMG;
     FirebaseAuth mAuth;
-    TextView profileName;
+    TextView profileName,profileEmail;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
     Users users;
@@ -58,15 +68,19 @@ public class UserProfile extends AppCompatActivity {
     Uri imageUri;
     StorageReference storageReference;
     ProgressDialog progressDialog;
+    DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
-        userName = findViewById(R.id.UPName);
-        userEmail = findViewById(R.id.UPEmail);
-        userPhone = findViewById(R.id.UPPhoneNo);
+        Toolbar toolbar = findViewById(R.id.toolBar4);
+        setSupportActionBar(toolbar);
+
+        userName1 = findViewById(R.id.UPName);
+        userEmail1 = (TextInputEditText) findViewById(R.id.UPEmail);
+        userPhone1 = findViewById(R.id.UPPhoneNo);
         btnUpdate = findViewById(R.id.btn_UPUpdate);
         profile = findViewById(R.id.profileImage);
         profilePic = findViewById(R.id.PicChange);
@@ -81,6 +95,22 @@ public class UserProfile extends AppCompatActivity {
         databaseReference = firebaseDatabase.getReference("Users");
         users = new Users();
 
+        drawer = findViewById(R.id.drawerLayoutUserProfile);
+        NavigationView navigationView = findViewById(R.id.nav_view4);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        //View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header);
+        View headerLayout = navigationView.getHeaderView(0);
+        userIMG = (ImageView) headerLayout.findViewById(R.id.userImage);
+        profileName = (TextView) headerLayout.findViewById(R.id.nav_userName);
+        profileEmail = (TextView) headerLayout.findViewById(R.id.nav_Email);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -88,25 +118,26 @@ public class UserProfile extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
 
-        profilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(UserProfile.this, "Fuck you 2", Toast.LENGTH_SHORT).show();
-            }
-        });
-        
-        btnUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
-
-        btnPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(UserProfile.this,SignUpActivity.class));
-            }
-        });
+//        profilePic.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(UserProfile.this, "Fuck you 2", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        btnUpdate.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                UpdateDetails();
+//            }
+//        });
+//
+//        btnPassword.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                startActivity(new Intent(UserProfile.this,SignUpActivity.class));
+//            }
+//        });
     }
 
     public void uploadImage(View view) {
@@ -117,9 +148,9 @@ public class UserProfile extends AppCompatActivity {
         
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.UK);
         Date now = new Date();
-        String fileName = formatter.format(now);
+        //String fileName = formatter.format(now);
 
-        storageReference = FirebaseStorage.getInstance().getReference("images/"+fileName);
+        storageReference = FirebaseStorage.getInstance().getReference("images/"+mAuth.getUid());
 
         storageReference.putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -156,7 +187,22 @@ public class UserProfile extends AppCompatActivity {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if(acct==null && accessToken == null)
         {
-            Toast.makeText(UserProfile.this, "Logging from nowhere", Toast.LENGTH_SHORT).show();
+            databaseReference.child(mAuth.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    if (!task.isSuccessful()) {
+                        Log.e("firebase", "Error getting data", task.getException());
+                    }
+                    else {
+                        //Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                        DataSnapshot dataSnapshot = task.getResult();
+                        String _userEmail = String.valueOf(dataSnapshot.child("userEmail").getValue());
+                        userEmail1.setText(_userEmail);
+                        //Toast.makeText(UserProfile.this, "email: "+_userEmail, Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
         }
         else
         {
@@ -170,8 +216,8 @@ public class UserProfile extends AppCompatActivity {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getBaseContext());
         if (acct != null) {
             profileName.setText(acct.getDisplayName());
-            userName.setText(acct.getDisplayName());
-            userEmail.setText(acct.getEmail());
+            profileName.setText(acct.getDisplayName());
+            profileEmail.setText(acct.getEmail());
             Picasso.get().load(acct.getPhotoUrl()).placeholder(R.mipmap.ic_launcher).into(profile);
         }
 
@@ -189,8 +235,8 @@ public class UserProfile extends AppCompatActivity {
                         String image_url = jsonObject.getJSONObject("picture").getJSONObject("data").getString("url");
 
                         profileName.setText(first_name+" "+last_name);
-                        userName.setText(first_name+" "+last_name);
-                        userEmail.setText(userEmails);
+                        userName1.setText(first_name+" "+last_name);
+                        profileEmail.setText(userEmails);
                         Picasso.get().load(image_url).placeholder(R.mipmap.ic_launcher).into(profile);
 
                     } catch (JSONException e) {
@@ -203,10 +249,6 @@ public class UserProfile extends AppCompatActivity {
             parameter.putString("fields", "first_name,last_name,email,id,link,picture.type(large)");
             request.setParameters(parameter);
             request.executeAsync();
-        }
-        if(isVerified())
-        {
-            //profileName.setText();
         }
     }
 
@@ -237,20 +279,13 @@ public class UserProfile extends AppCompatActivity {
             //Check the textInputs are filled
             //Password changes, add phone number, add profile picture
             // after the profile picture update, have to create method to load into navigation drawer
-            if(!userName.getText().toString().isEmpty())
+            if(!userName1.getText().toString().isEmpty())
             {
-                if(!userEmail.getText().toString().isEmpty())
+                if(!userEmail1.getText().toString().isEmpty())
                 {
-                    if(!userPhone.getText().toString().isEmpty())
+                    if(!userPhone1.getText().toString().isEmpty())
                     {
-                        if(!userPassword.getText().toString().isEmpty())
-                        {
-                            updateNonValidUser();
-                        }
-                        else
-                        {
-                            Toast.makeText(UserProfile.this, "Username is empty", Toast.LENGTH_SHORT).show();
-                        }
+                        updateNonValidUser();
                     }
                     else
                     {
@@ -272,13 +307,12 @@ public class UserProfile extends AppCompatActivity {
 
     private void updateNonValidUser() {
 
-        String usersName = userName.getText().toString();
-        String usersEmail = userEmail.getText().toString();
+        String usersName = userName1.getText().toString();
+        String usersEmail = userEmail1.getText().toString();
         String usersProfile = imageUri.toString();
-        String usersPhone = userPhone.getText().toString();
-        String usersPassword = userPassword.getText().toString();
+        String usersPhone = userPhone1.getText().toString();
 
-        if(usersName.isEmpty() || usersEmail.isEmpty() ||usersProfile.isEmpty() || usersPhone.isEmpty() || usersPassword.isEmpty())
+        if(usersName.isEmpty() || usersEmail.isEmpty() ||usersProfile.isEmpty() || usersPhone.isEmpty() )
         {
             Toast.makeText(UserProfile.this, "Please check the data before update", Toast.LENGTH_SHORT).show();
         }
@@ -297,5 +331,71 @@ public class UserProfile extends AppCompatActivity {
         result = acct != null || accessToken != null;
         return !result;
 
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.nav_view1:
+                startActivity(new Intent(UserProfile.this,ViewRecords.class));
+                break;
+            case R.id.nav_add:
+                startActivity(new Intent(UserProfile.this,AddRecords.class));
+                break;
+            case  R.id.nav_report:
+                startActivity(new Intent(UserProfile.this,Reports.class));
+                break;
+            case R.id.nav_edit:
+                startActivity(new Intent(UserProfile.this,EditData.class));
+                break;
+            case R.id.nav_logout:
+                mAuth.signOut();
+                LoginManager.getInstance().logOut();
+                Toast.makeText(UserProfile.this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(UserProfile.this,Login.class));
+                break;
+            case R.id.nav_profile:
+                startActivity(new Intent(UserProfile.this, UserProfile.class));
+                break;
+            default:
+                startActivity(new Intent(UserProfile.this,MainActivity.class));
+        }
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(drawer.isDrawerOpen(GravityCompat.START))
+        {
+            drawer.closeDrawer(GravityCompat.START);
+        }
+        else
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle("Exit Application?");
+            alertDialogBuilder
+                    .setMessage("Click yes to exit!")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    moveTaskToBack(true);
+                                    android.os.Process.killProcess(android.os.Process.myPid());
+                                    System.exit(1);
+                                }
+                            })
+
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
     }
 }

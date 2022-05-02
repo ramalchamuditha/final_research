@@ -6,4 +6,32 @@
     android:layout_height="match_parent"
     tools:context=".OCR_Result">
 
+    <SurfaceView
+        android:id="@+id/surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/txtView512"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="No Text"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/submitData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="307dp"
+        android:layout_marginTop="621dp"
+        android:layout_marginEnd="14dp"
+        android:text="Submit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/surface_view"
+        app:layout_constraintStart_toStartOf="@+id/txtView512"
+        app:layout_constraintTop_toTopOf="@+id/surface_view" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -31,6 +32,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -263,6 +266,25 @@ public class ViewRecords extends AppCompatActivity implements NavigationView.OnN
             parameter.putString("fields","first_name,last_name,email,id,link,picture.type(large)");
             request.setParameters(parameter);
             request.executeAsync();
+        }
+        else
+        {
+            databaseReferenceUsers.child(mAuth.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    if (!task.isSuccessful()) {
+                        Log.e("firebase", "Error getting data", task.getException());
+                    }
+                    else {
+                        //Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                        DataSnapshot dataSnapshot = task.getResult();
+                        String _userEmail = String.valueOf(dataSnapshot.child("userEmail").getValue());
+                        profileEmail.setText(_userEmail);
+                        //Toast.makeText(ViewRecords.this, "email: "+_userEmail, Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
         }
 
     }
