@@ -35,9 +35,9 @@ import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 
-public class OCR_Activity extends AppCompatActivity{
+public class OCR_Activity extends AppCompatActivity {
 
-    Button btnCapture,btncopy;
+    Button btnCapture, btnCopy;
     TextView viewText;
     ImageView imageView;
     DatabaseReference mDatabase;
@@ -52,11 +52,11 @@ public class OCR_Activity extends AppCompatActivity{
         setContentView(R.layout.activity_ocr);
 
         btnCapture = findViewById(R.id.BtnCapture);
-        btncopy = findViewById(R.id.btn_detect);
+        btnCopy = findViewById(R.id.btn_detect);
         viewText = findViewById(R.id.view_data);
         imageView = findViewById(R.id.imageView);
 
-        btncopy.setOnClickListener(new View.OnClickListener() {
+        btnCopy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 detectText();
@@ -67,12 +67,9 @@ public class OCR_Activity extends AppCompatActivity{
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkPermission())
-                {
+                if (checkPermission()) {
                     captureImage();
-                }
-                else
-                {
+                } else {
                     requestPermission();
                 }
             }
@@ -81,50 +78,42 @@ public class OCR_Activity extends AppCompatActivity{
 
     }
 
-    private boolean checkPermission()
-    {
+    private boolean checkPermission() {
         int cameraPermission = ContextCompat.checkSelfPermission(OCR_Activity.this, Manifest.permission.CAMERA);
         return cameraPermission == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void requestPermission()
-    {
+    private void requestPermission() {
         int permission_code = 200;
-        ActivityCompat.requestPermissions(OCR_Activity.this,new String[]{Manifest.permission.CAMERA}, permission_code);
+        ActivityCompat.requestPermissions(OCR_Activity.this, new String[]{Manifest.permission.CAMERA}, permission_code);
 
     }
 
-    private void captureImage()
-    {
+    private void captureImage() {
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(takePicture.resolveActivity(getPackageManager())!=null)
-        {
-            startActivityForResult(takePicture,REQUEST_IMAGE_CAPTURE);
+        if (takePicture.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
         }
     }
 
-    private void detectText()
-    {
-        InputImage image = InputImage.fromBitmap(imageBitmap,0);
+    private void detectText() {
+        InputImage image = InputImage.fromBitmap(imageBitmap, 0);
         TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         Task<Text> result = recognizer.process(image).addOnSuccessListener(new OnSuccessListener<Text>() {
             @Override
             public void onSuccess(Text text) {
                 StringBuilder result = new StringBuilder();
-                for(Text.TextBlock block : text.getTextBlocks())
-                {
+                for (Text.TextBlock block : text.getTextBlocks()) {
                     String blockText = block.getText();
                     Point[] blockCornerPoint = block.getCornerPoints();
                     Rect blockFrame = block.getBoundingBox();
 
-                    for(Text.Line line : block.getLines())
-                    {
+                    for (Text.Line line : block.getLines()) {
                         String LineText = line.getText();
                         Point[] lineCornerPoint = line.getCornerPoints();
                         Rect lineRect = line.getBoundingBox();
 
-                        for(Text.Element element : line.getElements())
-                        {
+                        for (Text.Element element : line.getElements()) {
                             String elementText = element.getText();
                             result.append(elementText);
                         }
@@ -138,7 +127,7 @@ public class OCR_Activity extends AppCompatActivity{
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(OCR_Activity.this,"Fail to detect Text"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(OCR_Activity.this, "Fail to detect Text" + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -147,14 +136,12 @@ public class OCR_Activity extends AppCompatActivity{
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults.length>0){
+        if (grantResults.length > 0) {
             boolean cameraPermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-            if(cameraPermission)
-            {
-                Toast.makeText(this,"Permission Granted",Toast.LENGTH_SHORT).show();
-            }else
-            {
-                Toast.makeText(this,"Permission Denied",Toast.LENGTH_SHORT).show();
+            if (cameraPermission) {
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -162,50 +149,13 @@ public class OCR_Activity extends AppCompatActivity{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK)
-        {
-            if(requestCode == REQUEST_IMAGE_CAPTURE)
-            {
-                picUri = data.getData();
-                performCrop();
-            }
-            else if(requestCode == PIC_CROP)
-            {
-                Bundle extras = data.getExtras();
-                imageBitmap = (Bitmap) extras.get("data");
-                performCrop();
-                imageView.setImageBitmap(imageBitmap);
-            }
+        if (resultCode == RESULT_OK && requestCode == REQUEST_IMAGE_CAPTURE) {
+
+            Bundle extras = data.getExtras();
+            imageBitmap = (Bitmap) extras.get("data");
+            imageView.setImageBitmap(imageBitmap);
 
         }
     }
-
-    private void performCrop() {
-        try {
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            //indicate image type and Uri
-            cropIntent.setDataAndType(picUri, "image/*");
-            //set crop properties
-            cropIntent.putExtra("crop", "true");
-            //indicate aspect of desired crop
-            cropIntent.putExtra("aspectX", 1);
-            cropIntent.putExtra("aspectY", 1);
-            //indicate output X and Y
-            cropIntent.putExtra("outputX", 256);
-            cropIntent.putExtra("outputY", 256);
-            //retrieve data on return
-            cropIntent.putExtra("return-data", true);
-            //start the activity - we handle returning in onActivityResult
-            startActivityForResult(cropIntent, PIC_CROP);
-
-        }
-        catch(ActivityNotFoundException anfe){
-            //display an error message
-            String errorMessage = "Whoops - your device doesn't support the crop action!";
-            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    }
-
 
 }

@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".OCR_Test">
+    tools:context=".OCR_Test1">
 
     <ImageView
-        android:id="@+id/imageView25"
+        android:id="@+id/imageView26"
         android:layout_height="200dp"
         android:layout_width="match_parent"
         android:src="@drawable/com_facebook_profile_picture_blank_portrait"
@@ -17,21 +17,21 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_below="@+id/imageView25"
-        android:id="@+id/captureImage"
+        android:layout_below="@+id/imageView26"
+        android:id="@+id/captureImage1"
         android:text="Capture image "/>
 
     <Button
-        android:id="@+id/textIdentify"
+        android:id="@+id/btnIdentify1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_below="@id/captureImage"
+        android:layout_below="@id/captureImage1"
         android:text="Detect Dates" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_below="@id/textIdentify"
-        android:id="@+id/txtIdentified"/>
+        android:layout_below="@id/btnIdentify1"
+        android:id="@+id/txtIdentified1"/>
 
 </RelativeLayout>

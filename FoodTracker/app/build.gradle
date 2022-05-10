@@ -93,6 +93,9 @@ dependencies {
     //noinspection GradleDependency
     implementation "androidx.camera:camera-extensions:${camerax_version}"
 
+    //implementation 'com.github.mike14u:croperino:1.1.8'
 
+    implementation 'com.github.krokyze:ucropnedit:2.2.8'
+    implementation 'com.mikhaellopez:circularimageview:3.2.0'
 
 }

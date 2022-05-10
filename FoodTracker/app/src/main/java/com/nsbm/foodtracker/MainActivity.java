@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 bottomSheetView.findViewById(R.id.QuickScan2).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        startActivity(new Intent(MainActivity.this,AddRecords.class));
+                        startActivity(new Intent(MainActivity.this,OCR_Test.class));
                         bottomSheetDialog.dismiss();
                     }
                 });
