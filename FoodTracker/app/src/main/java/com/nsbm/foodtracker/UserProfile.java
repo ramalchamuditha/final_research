@@ -6,22 +6,29 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -45,6 +52,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.nsbm.foodtracker.databinding.ActivityUserProfileBinding;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,21 +61,23 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class UserProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class UserProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     GoogleSignInClient mGoogleSignInClient;
-    TextInputEditText userName1,userEmail1,userPhone1;
-    Button btnUpdate,profilePic,btnPassword;
-    ImageView profile,userIMG;
+    TextInputEditText userName1, userEmail1, userPhone1;
+    Button btnUpdate, profilePic, btnPassword;
+    ImageView profileImage1, userIMG;
     FirebaseAuth mAuth;
-    TextView profileName,profileEmail;
+    TextView profileName, profileEmail, profileName1;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
     Users users;
-    ActivityUserProfileBinding binding;
     Uri imageUri;
     StorageReference storageReference;
-    ProgressDialog progressDialog;
+    String cameraPermission[];
+    String storagePermission[];
+    private static final int CAMERA_REQUEST = 100;
+    private static final int STORAGE_REQUEST = 200;
     DrawerLayout drawer;
 
     @Override
@@ -82,13 +92,11 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         userEmail1 = (TextInputEditText) findViewById(R.id.UPEmail);
         userPhone1 = findViewById(R.id.UPPhoneNo);
         btnUpdate = findViewById(R.id.btn_UPUpdate);
-        profile = findViewById(R.id.profileImage);
+        profileImage1 = findViewById(R.id.profileImage);
         profilePic = findViewById(R.id.PicChange);
-        profileName = findViewById(R.id.profileUserName);
+        profileName1 = findViewById(R.id.profileUserName);
         btnPassword = findViewById(R.id.NewPassword);
 
-        binding = ActivityUserProfileBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -106,7 +114,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         profileEmail = (TextView) headerLayout.findViewById(R.id.nav_Email);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
-                R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -116,114 +124,201 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                 .requestEmail()
                 .build();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-//        profilePic.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(UserProfile.this, "Fuck you 2", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        btnUpdate.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                UpdateDetails();
-//            }
-//        });
-//
-//        btnPassword.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                startActivity(new Intent(UserProfile.this,SignUpActivity.class));
-//            }
-//        });
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showImagePicDialog();
+            }
+        });
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UpdateDetails();
+            }
+        });
+
+        btnPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(UserProfile.this,SignUpActivity.class));
+            }
+        });
     }
 
-    public void uploadImage(View view) {
+    private void showImagePicDialog() {
+        String options[] = {"Camera", "Gallery"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pick Image From");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    if (!checkCameraPermission()) {
+                        requestCameraPermission();
+                    } else {
+                        pickFromGallery();
+                    }
+                } else if (which == 1) {
+                    if (!checkStoragePermission()) {
+                        requestStoragePermission();
+                    } else {
+                        pickFromGallery();
+                    }
+                }
+            }
+        });
+        builder.create().show();
+    }
 
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("uploading File");
-        progressDialog.show();
-        
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.UK);
-        Date now = new Date();
-        //String fileName = formatter.format(now);
+    private void pickFromGallery() {
+        CropImage.activity().start(UserProfile.this);
+    }
 
-        storageReference = FirebaseStorage.getInstance().getReference("images/"+mAuth.getUid());
+    // checking storage permissions
+    private Boolean checkStoragePermission() {
+        boolean result = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
+        return result;
+    }
 
-        storageReference.putFile(imageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+    // Requesting  gallery permission
+    private void requestStoragePermission() {
+        ActivityCompat.requestPermissions(this, storagePermission, STORAGE_REQUEST);
+    }
+
+    // checking camera permissions
+    private Boolean checkCameraPermission() {
+        boolean result = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == (PackageManager.PERMISSION_GRANTED);
+        boolean result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
+        return result && result1;
+    }
+
+    // Requesting camera permission
+    private void requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, cameraPermission, CAMERA_REQUEST);
+    }
+
+    private void UpdateDetails() {
+        String _userName = userName1.getText().toString();
+        String _telephone = userPhone1.getText().toString();
+
+        if(_userName.equals(userName1.getText().toString()))
+        {
+            Toast.makeText(UserProfile.this, "Please update Name", Toast.LENGTH_SHORT).show();
+
+        }
+        else if(_telephone.equals(userPhone1.getText().toString()))
+        {
+            Toast.makeText(UserProfile.this, "Please update Telephone", Toast.LENGTH_SHORT).show();
+        }
+
+        else if(!_userName.equals(userName1.getText().toString()) && !_telephone.equals(userPhone1.getText().toString()))
+        {
+            String UID = mAuth.getUid();
+            users.setUserPhone(userPhone1.getText().toString());
+            databaseReference.child(UID).setValue(users);
+            databaseReference.child(UID).child("userName").setValue(userName1.getText().toString());
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case CAMERA_REQUEST: {
+                if (grantResults.length > 0) {
+                    boolean camera_accepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean writeStorageaccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    if (camera_accepted && writeStorageaccepted) {
+                        pickFromGallery();
+                    } else {
+                        Toast.makeText(this, "Please Enable Camera and Storage Permissions", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+            break;
+            case STORAGE_REQUEST: {
+                if (grantResults.length > 0) {
+                    boolean writeStorageaccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (writeStorageaccepted) {
+                        pickFromGallery();
+                    } else {
+                        Toast.makeText(this, "Please Enable Storage Permissions", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                imageUri = result.getUri();
+                Glide.with(UserProfile.this).load(imageUri).into(profileImage1);
+                uploadImage();
+            }
+        }
+    }
+
+    private void uploadImage() {
+        StorageReference fileRef = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imageUri));
+        fileRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                binding.profileImage.setImageURI(null);
-                Toast.makeText(UserProfile.this, "Successfully uploaded", Toast.LENGTH_SHORT).show();
-                if(progressDialog.isShowing())
-                    progressDialog.dismiss();
+                fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Uri downloadUri = uri;
+                        users.setUserProfile(downloadUri.toString());
+                        Toast.makeText(UserProfile.this, "uploaded", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                if(progressDialog.isShowing())
-                    progressDialog.dismiss();
-                Toast.makeText(UserProfile.this, "Successfully uploaded", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UserProfile.this, "Upload Failed", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void selectImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent,100);
+    private String getFileExtension(Uri mUri) {
+        ContentResolver cr = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cr.getType(mUri));
     }
+
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getBaseContext());
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if(acct==null && accessToken == null)
-        {
-            databaseReference.child(mAuth.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    if (!task.isSuccessful()) {
-                        Log.e("firebase", "Error getting data", task.getException());
-                    }
-                    else {
-                        //Log.d("firebase", String.valueOf(task.getResult().getValue()));
-                        DataSnapshot dataSnapshot = task.getResult();
-                        String _userEmail = String.valueOf(dataSnapshot.child("userEmail").getValue());
-                        userEmail1.setText(_userEmail);
-                        //Toast.makeText(UserProfile.this, "email: "+_userEmail, Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-            });
-        }
-        else
-        {
-            viewProfile();
-        }
-
+        viewProfile();
     }
 
-    private void viewProfile()
-    {
+    private void viewProfile() {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getBaseContext());
         if (acct != null) {
-            profileName.setText(acct.getDisplayName());
+            btnPassword.setVisibility(View.INVISIBLE);
             profileName.setText(acct.getDisplayName());
             profileEmail.setText(acct.getEmail());
-            Picasso.get().load(acct.getPhotoUrl()).placeholder(R.mipmap.ic_launcher).into(profile);
+            Picasso.get().load(acct.getPhotoUrl()).placeholder(R.mipmap.ic_launcher).into(userIMG);
+            profileImage1.setImageURI(acct.getPhotoUrl());
+            profileName.setText(acct.getDisplayName());
+            userName1.setText(acct.getDisplayName());
+            userEmail1.setText(acct.getEmail());
         }
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if(accessToken!=null)
-        {
+        if (accessToken != null) {
+            btnPassword.setVisibility(View.INVISIBLE);
             GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
                 @Override
                 public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
@@ -234,10 +329,10 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                         String id = jsonObject.getString("id");
                         String image_url = jsonObject.getJSONObject("picture").getJSONObject("data").getString("url");
 
-                        profileName.setText(first_name+" "+last_name);
-                        userName1.setText(first_name+" "+last_name);
+                        profileName.setText(first_name + " " + last_name);
+                        userName1.setText(first_name + " " + last_name);
                         profileEmail.setText(userEmails);
-                        Picasso.get().load(image_url).placeholder(R.mipmap.ic_launcher).into(profile);
+                        Picasso.get().load(image_url).placeholder(R.mipmap.ic_launcher).into(profileImage1);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -250,116 +345,73 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
             request.setParameters(parameter);
             request.executeAsync();
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == 100 && data != null && data.getData() != null)
-        {
-            imageUri = data.getData();
-            binding.profileImage.setImageURI(imageUri);
-        }
-    }
-
-    public void selectImage(View view) {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent,100);
-    }
-
-    public void UpdateDetails()
-    {
-        if(isVerified())
-        {
-            //Here is false statement
-            //Where the non-facebook/google users updates
-            //Check the textInputs are filled
-            //Password changes, add phone number, add profile picture
-            // after the profile picture update, have to create method to load into navigation drawer
-            if(!userName1.getText().toString().isEmpty())
-            {
-                if(!userEmail1.getText().toString().isEmpty())
-                {
-                    if(!userPhone1.getText().toString().isEmpty())
-                    {
-                        updateNonValidUser();
-                    }
-                    else
-                    {
-                        Toast.makeText(UserProfile.this, "Username is empty", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(UserProfile.this, "Username is empty", Toast.LENGTH_SHORT).show();
-                }
-            }
-            else
-            {
-                Toast.makeText(UserProfile.this, "Username is empty", Toast.LENGTH_SHORT).show();
-            }
-
-        }
-    }
-
-    private void updateNonValidUser() {
-
-        String usersName = userName1.getText().toString();
-        String usersEmail = userEmail1.getText().toString();
-        String usersProfile = imageUri.toString();
-        String usersPhone = userPhone1.getText().toString();
-
-        if(usersName.isEmpty() || usersEmail.isEmpty() ||usersProfile.isEmpty() || usersPhone.isEmpty() )
-        {
-            Toast.makeText(UserProfile.this, "Please check the data before update", Toast.LENGTH_SHORT).show();
-        }
         else
         {
-            
+            databaseReference.child(mAuth.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    if (!task.isSuccessful()) {
+                        Log.e("firebase", "Error getting data", task.getException());
+                    }
+                    else {
+                        btnPassword.setVisibility(View.INVISIBLE);
+                        //Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                        DataSnapshot dataSnapshot = task.getResult();
+                        String _userEmail = String.valueOf(dataSnapshot.child("userEmail").getValue());
+                        String _userName = String.valueOf(dataSnapshot.child("userName").getValue());
+                        Uri _userImage = Uri.parse(String.valueOf(dataSnapshot.child("userProfile").getValue()));
+                        Glide.with(UserProfile.this).load(_userImage).into(userIMG);
+                        profileName1.setText(_userName);
+                        profileEmail.setText(_userEmail);
+                        Glide.with(UserProfile.this).load(_userImage).into(profileImage1);
+                        profileName.setText(_userName);
+                        userName1.setText(_userName);
+                        userEmail1.setText(_userEmail);
+                        //Toast.makeText(ViewRecords.this, "email: "+_userEmail, Toast.LENGTH_SHORT).show();
+                    }
 
+                }
+            });
         }
-
     }
 
-    private boolean isVerified() {
-        boolean result;
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getBaseContext());
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        result = acct != null || accessToken != null;
-        return !result;
-
-    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId())
-        {
+        switch (item.getItemId()) {
             case R.id.nav_view1:
-                startActivity(new Intent(UserProfile.this,ViewRecords.class));
+                startActivity(new Intent(UserProfile.this, ViewRecords.class));
                 break;
             case R.id.nav_add:
-                startActivity(new Intent(UserProfile.this,AddRecords.class));
-                break;
-            case  R.id.nav_report:
-                startActivity(new Intent(UserProfile.this,Reports.class));
+                String options[] = {"Manually", "Scan"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Add record by");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (i == 0) {
+                            startActivity(new Intent(UserProfile.this, AddRecords.class));
+                        } else if (i == 1) {
+                            startActivity(new Intent(UserProfile.this, OCR_Activity2.class));
+                        }
+                    }
+                });
+                builder.create().show();
                 break;
             case R.id.nav_edit:
-                startActivity(new Intent(UserProfile.this,EditData.class));
+                startActivity(new Intent(UserProfile.this, EditData.class));
                 break;
             case R.id.nav_logout:
                 mAuth.signOut();
                 LoginManager.getInstance().logOut();
                 Toast.makeText(UserProfile.this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(UserProfile.this,Login.class));
+                startActivity(new Intent(UserProfile.this, Login.class));
                 break;
             case R.id.nav_profile:
                 startActivity(new Intent(UserProfile.this, UserProfile.class));
                 break;
             default:
-                startActivity(new Intent(UserProfile.this,MainActivity.class));
+                startActivity(new Intent(UserProfile.this, MainActivity.class));
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -367,12 +419,9 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
 
     @Override
     public void onBackPressed() {
-        if(drawer.isDrawerOpen(GravityCompat.START))
-        {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }
-        else
-        {
+        } else {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle("Exit Application?");
             alertDialogBuilder

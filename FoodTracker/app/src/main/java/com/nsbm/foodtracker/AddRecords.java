@@ -11,9 +11,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -52,13 +56,18 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class AddRecords extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class AddRecords extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener,
+        DatePickerDialog.OnDateSetListener {
 
     private FirebaseAuth mAuth;
     private FirebaseDatabase firebaseDatabase;
@@ -73,7 +82,30 @@ public class AddRecords extends AppCompatActivity implements NavigationView.OnNa
     Users users;
     ListView listView;
     List<Item> itemList;
-    final Calendar myCalender = Calendar.getInstance();
+
+    @Override
+    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf3 = new SimpleDateFormat("MM/dd/yy");
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR,i);
+        c.set(Calendar.MONTH,i1);
+        c.set(Calendar.DAY_OF_MONTH,i2);
+
+        Date parsedDate = null;                     // dd-MM-yy
+        try {
+            String currentDate = DateFormat.getDateInstance(DateFormat.SHORT).format(c.getTime());
+            //String newDate = currentDate.replace("/", "-");
+            parsedDate = sdf3.parse(currentDate);
+            String newPDate = sdf.format(parsedDate);
+            itemExp.setText(newPDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,15 +157,6 @@ public class AddRecords extends AppCompatActivity implements NavigationView.OnNa
 
         String UserID = mAuth.getCurrentUser().getUid();
 
-        DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                myCalender.set(Calendar.YEAR,year);
-                myCalender.set(Calendar.MONTH,month);
-                myCalender.set(Calendar.DAY_OF_MONTH,day);
-                updateCalender();
-            }
-        };
 
         databaseReferenceItems.addValueEventListener(new ValueEventListener() {
             @Override
@@ -161,12 +184,6 @@ public class AddRecords extends AppCompatActivity implements NavigationView.OnNa
             }
         });
 
-        itemExp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DatePickerDialog(AddRecords.this,date,myCalender.get(Calendar.YEAR),myCalender.get(Calendar.MONTH),myCalender.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
 
         btnInsert.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SetTextI18n")
@@ -196,6 +213,29 @@ public class AddRecords extends AppCompatActivity implements NavigationView.OnNa
                     itemExp.setText("");
                     btnInsert.setText("Add another");
                     Toast.makeText(AddRecords.this, "Record added Successfully", Toast.LENGTH_SHORT).show();
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date date = new Date();
+                    Calendar calendar = Calendar.getInstance();
+                    String myDate = IExp;
+                    try {
+                        date = sdf.parse(myDate);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    calendar.setTime(date);
+                    calendar.add(Calendar.DAY_OF_MONTH,-14);
+                    Date modified = calendar.getTime();
+
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(System.currentTimeMillis());
+                    c.setTime(modified);
+                    c.set(Calendar.HOUR_OF_DAY,12);
+                    c.set(Calendar.MINUTE,10);
+                    c.set(Calendar.SECOND,0);
+
+                    startAlarm(c);
                 }
 
             }
@@ -210,6 +250,14 @@ public class AddRecords extends AppCompatActivity implements NavigationView.OnNa
 
     }
 
+    private void startAlarm(Calendar cal) {
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this,MyNotificationPublisher.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,1,intent,0);
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP,cal.getTimeInMillis(),pendingIntent);
+    }
+
     private void itemDataAdd(String UserID, String itemExp, String itemName)
     {
         String KeyID = firebaseDatabase.getReference("Items").push().getKey();
@@ -222,13 +270,6 @@ public class AddRecords extends AppCompatActivity implements NavigationView.OnNa
 
     }
 
-    private void updateCalender()
-    {
-        String myFormat = "yy-MM-dd";
-        SimpleDateFormat dateFormat = new SimpleDateFormat(myFormat, Locale.UK);
-        btnEdit.setText(dateFormat.format(myCalender.getTime()));
-    }
-
 
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId())
@@ -237,10 +278,23 @@ public class AddRecords extends AppCompatActivity implements NavigationView.OnNa
                 startActivity(new Intent(AddRecords.this,ViewRecords.class));
                 break;
             case R.id.nav_add:
-                startActivity(new Intent(AddRecords.this,AddRecords.class));
-                break;
-            case  R.id.nav_report:
-                startActivity(new Intent(AddRecords.this,Reports.class));
+                String options[] = {"Manually","Scan"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Add record by");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(i==0)
+                        {
+                            startActivity(new Intent(AddRecords.this,AddRecords.class));
+                        }
+                        else if(i==1)
+                        {
+                            startActivity(new Intent(AddRecords.this,OCR_Activity2.class));
+                        }
+                    }
+                });
+                builder.create().show();
                 break;
             case R.id.nav_edit:
                 startActivity(new Intent(AddRecords.this,EditData.class));
@@ -354,6 +408,10 @@ public class AddRecords extends AppCompatActivity implements NavigationView.OnNa
                         //Log.d("firebase", String.valueOf(task.getResult().getValue()));
                         DataSnapshot dataSnapshot = task.getResult();
                         String _userEmail = String.valueOf(dataSnapshot.child("userEmail").getValue());
+                        String _userName = String.valueOf(dataSnapshot.child("userName").getValue());
+                        Uri _userImage = Uri.parse(String.valueOf(dataSnapshot.child("userProfile").getValue()));
+                        Glide.with(AddRecords.this).load(_userImage).into(userIMG);
+                        profileName.setText(_userName);
                         profileEmail.setText(_userEmail);
                         //Toast.makeText(ViewRecords.this, "email: "+_userEmail, Toast.LENGTH_SHORT).show();
                     }
@@ -363,5 +421,10 @@ public class AddRecords extends AppCompatActivity implements NavigationView.OnNa
         }
 
 
+    }
+
+    public void openDate(View view) {
+        DialogFragment datePicker = new DatePickerFragment();
+        datePicker.show(getSupportFragmentManager(),"Date picker");
     }
 }

@@ -11,6 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -138,19 +139,45 @@ public class ViewRecords extends AppCompatActivity implements NavigationView.OnN
         myList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                id = i;
-                String itemID = itemList.get(i).getItemID();
-                String itemName = itemList.get(i).getItemName();
-                String itemExp = itemList.get(i).getExpireDate();
 
+                String options[] = {"Edit Item","Delete Item"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(ViewRecords.this);
+                builder.setTitle("Choose options");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int idk) {
+                        if(idk==0)
+                        {
+                            //startActivity(new Intent(ViewRecords.this,AddRecords.class));
+                            id = i;
+                            String itemID = itemList.get(i).getItemID();
+                            String itemName = itemList.get(i).getItemName();
+                            String itemExp = itemList.get(i).getExpireDate();
 
-                Intent update = new Intent(ViewRecords.this, EditData.class);
-                update.putExtra("Item_ID", itemID);
-                update.putExtra("Item_Name", itemName);
-                update.putExtra("Item_EXP", itemExp);
-                startActivity(update);
-
-
+                            Intent update = new Intent(ViewRecords.this, EditData.class);
+                            update.putExtra("Item_ID", itemID);
+                            update.putExtra("Item_Name", itemName);
+                            update.putExtra("Item_EXP", itemExp);
+                            startActivity(update);
+                        }
+                        else if(idk==1)
+                        {
+                            id = i;
+                            String itemID = itemList.get(i).getItemID();
+                            
+                            databaseReferenceItems.child(itemID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    itemList.remove(i);
+                                    ItemAdapter adapter = new ItemAdapter(ViewRecords.this, itemList);
+                                    myList.setAdapter(adapter);
+                                    Toast.makeText(ViewRecords.this, "Successfully deleted", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                });
+                builder.create().show();
             }
         });
 
@@ -164,10 +191,23 @@ public class ViewRecords extends AppCompatActivity implements NavigationView.OnN
                 startActivity(new Intent(ViewRecords.this,ViewRecords.class));
                 break;
             case R.id.nav_add:
-                startActivity(new Intent(ViewRecords.this,AddRecords.class));
-                break;
-            case  R.id.nav_report:
-                startActivity(new Intent(ViewRecords.this,Reports.class));
+                String options[] = {"Manually","Scan"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Add record by");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(i==0)
+                        {
+                            startActivity(new Intent(ViewRecords.this,AddRecords.class));
+                        }
+                        else if(i==1)
+                        {
+                            startActivity(new Intent(ViewRecords.this,OCR_Activity2.class));
+                        }
+                    }
+                });
+                builder.create().show();
                 break;
             case R.id.nav_edit:
                 startActivity(new Intent(ViewRecords.this,EditData.class));
@@ -279,6 +319,10 @@ public class ViewRecords extends AppCompatActivity implements NavigationView.OnN
                         //Log.d("firebase", String.valueOf(task.getResult().getValue()));
                         DataSnapshot dataSnapshot = task.getResult();
                         String _userEmail = String.valueOf(dataSnapshot.child("userEmail").getValue());
+                        String _userName = String.valueOf(dataSnapshot.child("userName").getValue());
+                        Uri _userImage = Uri.parse(String.valueOf(dataSnapshot.child("userProfile").getValue()));
+                        Glide.with(ViewRecords.this).load(_userImage).into(userIMG);
+                        profileName.setText(_userName);
                         profileEmail.setText(_userEmail);
                         //Toast.makeText(ViewRecords.this, "email: "+_userEmail, Toast.LENGTH_SHORT).show();
                     }

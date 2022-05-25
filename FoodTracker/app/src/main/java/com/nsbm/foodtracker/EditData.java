@@ -8,14 +8,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
 
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,7 +52,14 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class EditData extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+public class EditData extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        DatePickerDialog.OnDateSetListener {
     EditText txtName,txtEXP;
     String itemID,itemName,itemEXP;
     FirebaseAuth mAuth;
@@ -130,6 +144,32 @@ public class EditData extends AppCompatActivity implements NavigationView.OnNavi
 
 
     }
+    @Override
+    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf3 = new SimpleDateFormat("MM/dd/yy");
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, i);
+        c.set(Calendar.MONTH, i1);
+        c.set(Calendar.DAY_OF_MONTH, i2);
+
+        Date parsedDate = null;                     // dd-MM-yy
+        try {
+            String currentDate = DateFormat.getDateInstance(DateFormat.SHORT).format(c.getTime());
+            //String newDate = currentDate.replace("/", "-");
+            parsedDate = sdf3.parse(currentDate);
+            String newPDate = sdf.format(parsedDate);
+            txtEXP.setText(newPDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void openDate(View view) {
+        DialogFragment datePicker = new DatePickerFragment();
+        datePicker.show(getSupportFragmentManager(),"Date picker");
+    }
 
     private void updateItem(String ItemID,String ItemName, String ItemEXP)
     {
@@ -140,6 +180,28 @@ public class EditData extends AppCompatActivity implements NavigationView.OnNavi
         if (!ItemEXP.equals(txtEXP.getText().toString()))
         {
             mDatabase.child(ItemID).child("expireDate").setValue(txtEXP.getText().toString());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = new Date();
+            Calendar calendar = Calendar.getInstance();
+            String myDate = txtEXP.getText().toString();
+            try {
+                date = sdf.parse(myDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH,-14);
+            Date modified = calendar.getTime();
+
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(System.currentTimeMillis());
+            c.setTime(modified);
+            c.set(Calendar.HOUR_OF_DAY,12);
+            c.set(Calendar.MINUTE,10);
+            c.set(Calendar.SECOND,0);
+
+            startAlarm(c);
         }
         else
         {
@@ -179,6 +241,14 @@ public class EditData extends AppCompatActivity implements NavigationView.OnNavi
 
     }
 
+    private void startAlarm(Calendar cal) {
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this,MyNotificationPublisher.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,1,intent,0);
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP,cal.getTimeInMillis(),pendingIntent);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId())
@@ -187,11 +257,25 @@ public class EditData extends AppCompatActivity implements NavigationView.OnNavi
                 startActivity(new Intent(EditData.this,ViewRecords.class));
                 break;
             case R.id.nav_add:
-                startActivity(new Intent(EditData.this,AddRecords.class));
+                String options[] = {"Manually","Scan"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Add record by");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(i==0)
+                        {
+                            startActivity(new Intent(EditData.this,AddRecords.class));
+                        }
+                        else if(i==1)
+                        {
+                            startActivity(new Intent(EditData.this,OCR_Activity2.class));
+                        }
+                    }
+                });
+                builder.create().show();
                 break;
-            case  R.id.nav_report:
-                startActivity(new Intent(EditData.this,Reports.class));
-                break;
+
             case R.id.nav_edit:
                 startActivity(new Intent(EditData.this,EditData.class));
                 break;
@@ -219,29 +303,7 @@ public class EditData extends AppCompatActivity implements NavigationView.OnNavi
         }
         else
         {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setTitle("Exit Application?");
-            alertDialogBuilder
-                    .setMessage("Click yes to exit!")
-                    .setCancelable(false)
-                    .setPositiveButton("Yes",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    moveTaskToBack(true);
-                                    android.os.Process.killProcess(android.os.Process.myPid());
-                                    System.exit(1);
-                                }
-                            })
-
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                            dialog.cancel();
-                        }
-                    });
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
+            startActivity(new Intent(EditData.this,ViewRecords.class));
         }
     }
 
@@ -303,6 +365,10 @@ public class EditData extends AppCompatActivity implements NavigationView.OnNavi
                         //Log.d("firebase", String.valueOf(task.getResult().getValue()));
                         DataSnapshot dataSnapshot = task.getResult();
                         String _userEmail = String.valueOf(dataSnapshot.child("userEmail").getValue());
+                        String _userName = String.valueOf(dataSnapshot.child("userName").getValue());
+                        Uri _userImage = Uri.parse(String.valueOf(dataSnapshot.child("userProfile").getValue()));
+                        Glide.with(EditData.this).load(_userImage).into(userIMG);
+                        profileName.setText(_userName);
                         profileEmail.setText(_userEmail);
                         //Toast.makeText(ViewRecords.this, "email: "+_userEmail, Toast.LENGTH_SHORT).show();
                     }

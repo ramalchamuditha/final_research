@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onClick(View view) {
                         //Toast.makeText(MainActivity.this, "OCR", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(MainActivity.this,OCR_Activity.class));
+                        startActivity(new Intent(MainActivity.this,OCR_Activity2.class));
                         bottomSheetDialog.dismiss();;
                     }
                 });
@@ -136,20 +136,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
-                bottomSheetView.findViewById(R.id.QuickScan1).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startActivity(new Intent(MainActivity.this,OCR_Result.class));
-                        bottomSheetDialog.dismiss();
-                    }
-                });
-                bottomSheetView.findViewById(R.id.QuickScan2).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startActivity(new Intent(MainActivity.this,OCR_Test.class));
-                        bottomSheetDialog.dismiss();
-                    }
-                });
 
                 bottomSheetDialog.setContentView(bottomSheetView);
                 bottomSheetDialog.show();
@@ -160,8 +146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAuth.signOut();
-                startActivity(new Intent(MainActivity.this,Login.class));
+                startActivity(new Intent(MainActivity.this,NotificationActivity.class));
             }
         });
 
@@ -176,10 +161,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(MainActivity.this,ViewRecords.class));
                 break;
             case R.id.nav_add:
-                startActivity(new Intent(MainActivity.this,AddRecords.class));
-                break;
-            case  R.id.nav_report:
-                startActivity(new Intent(MainActivity.this,Reports.class));
+                String options[] = {"Manually","Scan"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Add record by");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(i==0)
+                        {
+                            startActivity(new Intent(MainActivity.this,AddRecords.class));
+                        }
+                        else if(i==1)
+                        {
+                            startActivity(new Intent(MainActivity.this,OCR_Activity2.class));
+                        }
+                    }
+                });
+                builder.create().show();
                 break;
             case R.id.nav_edit:
                 startActivity(new Intent(MainActivity.this,EditData.class));
@@ -342,6 +340,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         //Log.d("firebase", String.valueOf(task.getResult().getValue()));
                         DataSnapshot dataSnapshot = task.getResult();
                         String _userEmail = String.valueOf(dataSnapshot.child("userEmail").getValue());
+                        String _userName = String.valueOf(dataSnapshot.child("userName").getValue());
+                        Uri _userImage = Uri.parse(String.valueOf(dataSnapshot.child("userProfile").getValue()));
+                        Glide.with(MainActivity.this).load(_userImage).into(userIMG);
+                        profileName.setText(_userName);
                         profileEmail.setText(_userEmail);
                         //Toast.makeText(ViewRecords.this, "email: "+_userEmail, Toast.LENGTH_SHORT).show();
                     }

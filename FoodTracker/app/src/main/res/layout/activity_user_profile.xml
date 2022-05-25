@@ -6,14 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context=".UserProfile"
     tools:openDrawer="end">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="5dp">
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolBar4"
@@ -33,10 +33,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:background="#98c35c"
                     android:padding="20dp">
 
                     <ImageView
@@ -51,11 +51,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="10dp"
+                        android:layout_marginLeft="20dp"
                         android:layout_toRightOf="@id/profileImage"
                         android:fontFamily="@font/bungee"
                         android:includeFontPadding="false"
-                        android:text="New User"
                         android:textSize="20sp" />
 
 
@@ -94,7 +93,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:drawableStart="@drawable/ic_email"
-                            android:drawablePadding="10dp" />
+                            android:drawablePadding="10dp"
+                            android:editable="false"
+                            tools:ignore="Deprecated" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -150,6 +151,7 @@
 
                 </LinearLayout>
 
+
             </FrameLayout>
 
         </ScrollView>
@@ -163,6 +165,5 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu" />
-
 
 </androidx.drawerlayout.widget.DrawerLayout>
