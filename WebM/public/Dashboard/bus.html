@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://kit.fontawesome.com/0afbc9b86d.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Administrator</title>
+  </head>
+  <body id="body">
+    <div class="container">
+      <nav class="navbar">
+        <div class="nav_icon" onclick="toggleSidebar()">
+          <i class="fa fa-bars" aria-hidden="true"></i>
+        </div>
+        <div class="navbar__left">
+          
+          <a class="active_link" href="#">   </a>
+        </div>
+        <div class="navbar__right">
+          <a href="#">
+            <i class="fa fa-search" aria-hidden="true"></i>
+          </a>
+          <a href="#">
+            <i class="fa fa-clock-o" aria-hidden="true"></i>
+          </a>
+          <a href="#">
+            <img width="30" src="../assets/avatar.svg" alt="" />
+            <!-- <i class="fa fa-user-circle-o" aria-hidden="true"></i> -->
+          </a>
+        </div>
+      </nav>
+
+      <main>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Mate+SC&display=swap" rel="stylesheet">
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+        <div class="wrapper">
+          <h2>Register New Bus</h2>
+  <br>
+          <form id="FrmBus" class="form" method="post" action="#" >
+           
+            <input id="txtbusid" type="text" class="busid" placeholder="Bus ID"  required >
+            
+            <input id="txtBusroute" type="text" class="route" placeholder="Registered bus route" oninput="this.value = this.value.replace(/[^A-Za-z]/ig, '').replace(/(\..*)\./g, '$1');"  required >
+    
+            <input id="txtvehiclenumber" type="text" class="vehiclenumber" placeholder="Vehicle Registration Number"  required >
+          
+            <input id="txtnumofseats" type="text" class="numofseats" placeholder="Number of seats" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"  required>
+           
+            <input id="txtavailableseats" type="text" class="availableseats" placeholder="Number of available seats" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"  required >
+           
+            
+            <input id="btnSave" type="submit" class="submit" value="Register"  onclick="saveBus();">
+            
+             
+            <input id="btnUpdate" type="submit" class="submit" value="Update"  onclick="updatebus();">
+          
+       
+          </form>
+        </div>
+      </br>
+    </br>
+
+        <h2>Bus Details</h2>
+        <table  class="table table-dark text-white">
+          <thead>
+          
+            <th>Bus Id</th>
+            <th>Bus Route</th>
+            <th>vehicle Number</th>
+            <th>Number Of Seats</th>
+            <th>Available Seats</th>
+          </thead>
+
+        
+          <tbody id="dataset">
+
+          </tbody>
+      </table>
+       
+      </main>
+
+      <div id="sidebar">
+        <div class="sidebar__title">
+          <div class="sidebar__img">
+            <img src="../assets/farmer.svg" alt="logo" />
+            <h1>&nbsp;&nbsp; Administrator</h1>
+          </div>
+          <i
+            onclick="closeSidebar()"
+            class="fa fa-times"
+            id="sidebarIcon"
+            aria-hidden="true"
+          ></i>
+        </div>
+
+        <!--SIDE_BAR-->
+        <div class="sidebar__menu">
+          <div class="sidebar__link ">
+            <i class="fas fa-tachometer-alt"></i>
+            <a href="dashboard.html">Dashboard</a>
+          </div>
+
+          <div class="sidebar__link">
+            <i class="fas fa-bus"></i>
+            <a href="driver.html">Add Driver</a>
+          </div>
+         
+          <div class="sidebar__link">
+            <i class="fas fa-hand-holding-usd"></i>
+            <a href="conductor.html">Add Conductor</a>
+          </div>
+         
+          <div class="sidebar__link">
+            <i class="fas fa-calendar-alt"></i>
+            <a href="schedule.html">Insert Schedule</a>
+          </div>
+          
+          <div class="sidebar__link">
+            <i class="fas fa-info"></i>
+            <a href="bus.html">Insert bus details</a>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/5.0.0/firebase.js"></script>
+
+    <script>
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      var firebaseConfig = {
+        apiKey: "AIzaSyBlLqtPK-ujPV_XJnSImO-R-P4sAmRA0tg",
+        authDomain: "app2021-2e505.firebaseapp.com",
+        databaseURL: "https://app2021-2e505-default-rtdb.firebaseio.com",
+        projectId: "app2021-2e505",
+        storageBucket: "app2021-2e505.appspot.com",
+        messagingSenderId: "1008325124117",
+        appId: "1:1008325124117:web:aafb2b1e5f7cf2e59b2e1c",
+        measurementId: "G-V05ZETBS9S"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    
+    
+            var db = firebase.database();
+           // var db = firebase.database();
+    
+    var FrmBus = document.getElementById('FrmBus');
+    var txtbusid = document.getElementById('txtbusid');
+    var txtBusroute   = document.getElementById('txtBusroute');
+    var txtvehiclenumber   = document.getElementById('txtvehiclenumber');			
+    var txtnumofseats    = document.getElementById('txtnumofseats');
+    var txtavailableseats    = document.getElementById('txtavailableseats');
+  
+   
+
+    
+    
+    function saveBus()
+
+{ 
+  if(!txtbusid.value||!txtBusroute.value||!txtvehiclenumber.value||!txtnumofseats.value||!txtavailableseats.value)return null
+ 
+  
+ else{
+
+    var id=txtbusid.value
+
+    var dataRef=db.ref();
+    dataRef.child('Bus').orderByChild('BusId').equalTo(id).once('value',snapshot=>{
+
+    if(snapshot.exists())
+    {
+      alert("Already Exists");
+
+    }
+    
+    else
+    {
+
+      db.ref('Bus/'+id).set({
+          BusId: txtbusid.value,
+          Busroute: txtBusroute.value,
+          VehicleNumber: txtvehiclenumber.value,
+          NumofSeats: txtnumofseats.value,
+          AvailableSeats: txtavailableseats.value
+      });
+      alert("Successfull");
+      document.getElementById("FrmBus").reset();
+       
+    }
+  
+    
+      });
+    
+    }
+}
+function updatebus()
+{
+  if (!txtbusid.value || !txtBusroute.value || !txtvehiclenumber.value|| !txtnumofseats.value || !txtavailableseats.value) return null
+    
+  var id=txtbusid.value
+    
+          db.ref('Bus/'+id).set({
+          BusId: txtbusid.value,
+          Busroute: txtBusroute.value,
+          VehicleNumber: txtvehiclenumber.value,
+          NumofSeats: txtnumofseats.value,
+          AvailableSeats: txtavailableseats.value
+
+          
+      });
+    
+   
+    alert("Update Successfull");
+   
+    document.getElementById("FrmBus").reset();
+      location.reload();
+}
+
+
+
+function hideSaveButton()
+{
+
+  document.getElementById("btnSave").style.display="none";
+				document.getElementById("btnUpdate").style.display="block";
+}
+document.getElementById("btnUpdate").style.display="none";
+    
+
+
+  
+
+  var dataset = document.getElementById('dataset');
+
+  var readRef=db.ref('/Bus');
+
+  readRef.on('child_added',(data)=>{
+
+var tr=document.createElement('tr')
+tr.id=data.key;
+tr.innerHTML=dataSet(data.val())
+dataset.appendChild(tr);
+  });
+  readRef.on('child_changed',(data)=>{
+
+var dataNode=document.getElementById(data.key);
+dataNode.innerHTML=dataSet(data.val());
+
+  });
+			
+			readRef.on('child_removed', (data) => {
+  var dataNode = document.getElementById(data.key);
+  dataNode.parentNode.removeChild(dataNode);
+});
+
+
+  dataset.addEventListener('click', (e) => {
+  
+    var dataNode=e.target.parentNode
+// Update
+    if(e.target.classList.contains('edit')){
+
+      hideSaveButton();
+   
+      txtbusid.value = dataNode.querySelector('.txtbusid').innerText;
+      txtBusroute.value   = dataNode.querySelector('.txtBusroute').innerText;
+      txtvehiclenumber.value    = dataNode.querySelector('.txtvehiclenumber').innerText;		
+      txtnumofseats.value    = dataNode.querySelector('.txtnumofseats').innerText;
+      txtavailableseats.value    = dataNode.querySelector('.txtavailableseats').innerText;
+
+    }
+	  
+	   // Delete
+  if (e.target.classList.contains('delete')) {
+    var id = dataNode.id;
+    db.ref('Bus/'+ id).remove();
+  }
+
+	});
+  function dataSet({BusId,Busroute,VehicleNumber,NumofSeats,AvailableSeats})
+  {
+   return`
+
+      
+ 
+  <tr>
+    <td><div class='txtbusid'>${BusId}</div></td>
+    <td><div class='txtBusroute'>${Busroute}</div></td>
+    <td><div class='txtvehiclenumber'>${VehicleNumber}</div></td>
+    <td><div class='txtnumofseats'>${NumofSeats}</div></td>
+    <td><div class='txtavailableseats'>${AvailableSeats}</div></td>
+    <button class='edit'>Edit</button> 
+    <button class='delete'>Delete</button>
+   </tr>`
+
+  }
+
+
+    /*FrmBus.addEventListener('submit', (e) => {
+      e.preventDefault();
+    
+      if (!txtbusid.value || !txtBusroute.value || !txtvehiclenumber.value|| !txtnumofseats.value || !txtavailableseats.value) return null
+    
+      //var id=txtDriverId
+    
+          db.ref('Bus/').child( txtbusid.value).set({
+          BusId: txtbusid.value,
+          Busroute: txtBusroute.value,
+          VehicleNumber: txtvehiclenumber.value,
+          NumofSeats: txtnumofseats.value,
+          AvailableSeats: txtavailableseats.value
+      });
+    
+      document.getElementById("FrmBus").reset();
+      
+      location.reload();  
+          
+    
+      });*/
+    
+    
+    
+      
+    
+     
+    
+    
+    
+    
+    </script>
+    
+    <!-- <script>
+      window.ub.form.validationMessages.txtbusid.required = 'You forgot to enter your Bus Id!';
+   </script> -->
+    
+    
+    <!-- <script type="text/javascript" src="jquery.min.js"></script> -->
+    <script src="../js/dashboard.js"></script>
+  </body>
+</html>

@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+   <head>
+
+      <link rel="stylesheet" href="login.css"/>
+      <link rel="preconnect" href="https://fonts.gstatic.com">
+      <link href="https://fonts.googleapis.com/css2?family=Basic&display=swap" rel="stylesheet">
+      <link rel="preconnect" href="https://fonts.gstatic.com">
+      <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+
+
+      <title>Food Tracker: Login</title>
+   </head>
+   <body>
+      <div class="container">
+         <form id="FrmLogin" class="form" method="post" action="#">
+            <div class="login-box">
+               <div class="main-div">
+                  <div class="title">
+                     <h3>Welcome to Food Tracker</h3>
+                  </div>
+                  <div class="row">
+                     <div class="textboxtop"><input id="txtEmail"  type="text" placeholder="User Name"/></div>
+                     <div class="textboxtop"><input id="txtPassword" type="password" placeholder="Password"/></div>
+                  </div>
+                  <button  type="submit" class="submit" id="submit">Login</button>
+               </div>
+            </div>
+         </form>
+      </div>
+      <!-- The core Firebase JS SDK is always required and must be listed first -->
+      <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase.js"></script>
+      <script>
+         // Your web app's Firebase configuration
+         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+         var firebaseConfig = {
+          apiKey: "AIzaSyDoRq7muk0ru0kSRmOhbpGER_dd3ZHoOhY",
+          authDomain: "foodtracker-baade.firebaseapp.com",
+          databaseURL: "https://foodtracker-baade-default-rtdb.firebaseio.com",
+          projectId: "foodtracker-baade",
+          storageBucket: "foodtracker-baade.appspot.com",
+          messagingSenderId: "695910435495",
+          appId: "1:695910435495:web:c6e4cd7371bcd99b72e982",
+          measurementId: "G-B1R3K5G5W5"
+         };
+         // Initialize Firebase
+         firebase.initializeApp(firebaseConfig);
+         
+         document.getElementById('FrmLogin').addEventListener('submit',function(e){
+         e.preventDefault();
+         
+         var email=document.getElementById('txtEmail');
+         var password=document.getElementById('txtPassword');
+         
+         	if(email.value!="" && password.value!="")
+         	{        		
+               firebase.database().ref('Employee').orderByChild('userName').equalTo(email.value).once('value', snapshot=>{
+               if(snapshot.exists())                
+                  							
+               {
+                   							
+                     firebase.database().ref('Employee').orderByChild('password').equalTo(password.value).once('value', snapshot=>{
+                     if(snapshot.exists())                
+                     {	
+               
+                        alert("You Are Successfully Signed In! Welcome " + email.value);
+                        window.location ='Dashboard/dashboard.html'; 
+           						 
+                     }
+
+                     else{
+                        alert("Wrong email password");
+                     }
+                  });                                                                 
+         	
+         }
+         else
+              {
+                  alert("Wrong email password");
+               }
+          });
+               		 
+         				
+         	}
+         	else
+         	{
+         		alert("Email & Password can not be empty");
+         	}
+         
+         
+         });
+         
+      </script>
+   </body>
+   
+</html>
