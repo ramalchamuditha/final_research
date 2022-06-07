@@ -1,3 +1,38 @@
 <resources>
     <string name="app_name">Food Tracker-EMP</string>
+    <string name="facebook_app_id">482318716620811</string>
+    <string name="fb_login_protocol_scheme">fb482318716620811</string>
+    <string name="facebook_client_token">afbc16502781ef4c64d024a437ec6dd5</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="title_activity_main_menu">MainMenu</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_product_by">Add product by</string>
+    <string name="manually_entering_data">Manually entering data</string>
+    <string name="quick_scan">Quick scan</string>
+    <string name="hello_world_splash">Hello World, splash</string>
+    <string name="expire_date">Expire Date</string>
+    <string name="item_name">Item Name</string>
+    <string name="edit_data">Edit Data</string>
+    <string name="update">Update</string>
+    <string name="logo">LOGO</string>
+    <string name="web_API_key">AIzaSyCzZ6BdW_X7o2FRzUS0UsczET9HGYxnEAo</string>
+    <string name="password">Password</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="email">Email</string>
+    <string name="server_client_id">695910435495-ak8kc05m585vgeqh77na7dlknccppg84.apps.googleusercontent.com</string>
+    <string name="change_profile_picture">Change profile Picture</string>
+    <string name="change_password">Change Password</string>
+    <string name="web_client">695910435495-ak8kc05m585vgeqh77na7dlknccppg84.apps.googleusercontent.com</string>
 </resources>

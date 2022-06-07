@@ -3,7 +3,25 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/drawable/ic_emailnew.xml" value="0.2755208333333333" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/drawable/ic_login.xml" value="0.2755208333333333" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/activity_add_records.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/activity_cropper2.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/activity_edit_data.xml" value="0.259375" />
         <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/activity_main.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/activity_notification.xml" value="0.13385416666666666" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/activity_ocr2.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/activity_splash_screen.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/activity_view_records.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/batch_data.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/item_data.xml" value="0.13385416666666666" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/layout_botton_sheet.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/login_activity.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/nav_header.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/product_data.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/layout/products_datas.xml" value="0.1" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/menu/drawer_menu.xml" value="0.259375" />
+        <entry key="..\:/Users/Chamuditha/Documents/GitHub/final_research/FoodTracker_EMP/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.15" />
       </map>
     </option>
   </component>

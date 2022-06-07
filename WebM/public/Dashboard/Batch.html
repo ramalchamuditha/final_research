@@ -45,14 +45,10 @@
                 <h2>Insert Batch of products</h2>
                 <br>
                 <form id="FrmProdcuts" class="form" method="post" action="#">
-                    <input id="txtBatchID" type="text" class="productsID" placeholder="Batch number" required>
-                    <input id="txtbatchName" type="text" class="name" placeholder="Product Name"
-                        oninput="this.value = this.value.replace(/[^A-Za-z]/ig, '').replace(/(\..*)\./g, '$1');" required>
-                     <!--<input id="txtProductDate" type="date" class="date" required placeholder="Expire Date"> --> 
-                     <input type="text" placeholder="MM/DD/YYYY" onfocus="(this.type='date')">
-                    <input id="txtBatchAmount" type="text" class="amount" placeholder="Number of products" required
-                    <input id="txtBatchPrice" type="numer" class="contact" placeholder="Price of each product" step="1" required>
-                    <!--<input id="txtBusId" type="text" class="busid" placeholder="Bus ID" required>-->
+                    <input id="txtBatchID" type="text" class="txtBatchID" placeholder="Batch number" required>
+                    <input id="txtbatchName" type="text" class="txtbatchName" placeholder="Product Name" required>
+                    <input id="txtdate"  class="txtdate" type="text" placeholder="MM/DD/YYYY" onfocus="(this.type='date')" required>
+                    <input id="txtBatchAmount" type="text" class="txtBatchAmount" placeholder="Number of products" required>
                     <input id="btnSave" type="submit" class="submit" value="Insert" onclick="saveProduct();">
                     <input id="btnUpdate" type="submit" class="submit" value="Update" onclick="updateDriver();">
                 </form>
@@ -62,10 +58,9 @@
             <table class="table table-dark text-white">
                 <thead>
                     <th>Batch Number</th>
-                    <th>Batch Name</th>
+                    <th>Product Name</th>
                     <th>Expire Date</th>
                     <th>Number of Products</th>
-                    <!--<th>Bus Id</th>-->
                 </thead>
 
 
@@ -89,32 +84,32 @@
             <!--SIDE_BAR-->
             <div class="sidebar__menu">
                 <div class="sidebar__link active_menu_link">
-                  <i class="fas fa-tachometer-alt"></i>
+                  <!-- <i class="fas fa-tachometer-alt"></i> -->
                   <a href="dashboard.html">Dashboard</a>
                 </div>
-      
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-bus"></i>
+                  <!-- <i class="fas fa-bus"></i> -->
                   <a href="Products.html">Products</a>
                 </div>
-      
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-bus"></i>
+                  <!-- <i class="fas fa-bus"></i> -->
                   <a href="Batch.html">Batch</a>
                 </div>
-               
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-hand-holding-usd"></i>
+                  <!-- <i class="fas fa-hand-holding-usd"></i> -->
                   <a href="Employee.html">Employee</a>
                 </div>
-               
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-calendar-alt"></i>
-                  <a href="Sales.html">Sales</a>
+                  <!-- <i class="fas fa-calendar-alt"></i> -->
+                  <a href="Alerts.html">Alerts</a>
                 </div>
-                
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-info"></i>
+                  <!-- <i class="fas fa-info"></i> -->
                   <a href="ListProducts.html">Products List</a>
                 </div>
 
@@ -145,21 +140,22 @@
 
         var db = firebase.database();
 
-        var FrmProduct = document.getElementById('FrmDriver');
-        var txtDriverId = document.getElementById('txtDriverId');
-        var txtDriverName = document.getElementById('txtDriverName');
-        var txtDriverNic = document.getElementById('txtDriverNic');
-        var txtDriverContact = document.getElementById('txtDriverContact');
-        var txtBusId = document.getElementById('txtBusId');
+        var FrmProdcuts = document.getElementById('FrmProdcuts');
+        var txtBatchID = document.getElementById('txtBatchID');
+        var txtbatchName = document.getElementById('txtbatchName');
+        var txtdate = document.getElementById('txtdate');
+        var txtBatchAmount = document.getElementById('txtBatchAmount');
 
 
         function saveDriver() {
-            if (!txtDriverId.value || !txtDriverName.value || !txtDriverNic.value || !txtDriverContact.value || !txtBusId.value) return null
+            if (!txtBatchID.value || !txtbatchName.value || !txtdate.value || !txtBatchAmount.value) return null
 
-            var id = txtDriverId.value
+            else
+            {
+                var id = txtBatchID.value
 
-            var dataRef = db.ref();
-            dataRef.child('Driver').orderByChild('DriverId').equalTo(id).once('value', snapshot => {
+                var dataRef = db.ref();
+                dataRef.child('BatchItems').orderByChild('DriverId').equalTo(id).once('value', snapshot => {
 
                 if (snapshot.exists()) {
                     alert("Already Exists");
@@ -167,39 +163,42 @@
 
                 else {
 
-                    db.ref('Driver/' + id).set({
-                        DriverId: txtDriverId.value,
-                        DriverName: txtDriverName.value,
-                        DriverNic: txtDriverNic.value,
-                        DriverContact: txtDriverContact.value,
-                        BusId: txtBusId.value
-                    });
+                    var data = {
+                                batchID: txtBatchID.value,
+                                productName: txtbatchName.value,
+                                productExp: txtdate.value,
+                                amount: txtBatchAmount.value,
+                                shopID: 2
+                            }
+
+                            dataRef.child('BatchItems/' + txtvehiclenumber.value).set(data);
+
                     alert("Successfull");
-                    document.getElementById("FrmDriver").reset();
+                    document.getElementById("FrmProdcuts").reset();
 
 
                 }
 
             });
 
+            }
 
         }
 
         function updateDriver() {
-            if (!txtDriverId.value || !txtDriverName.value || !txtDriverNic.value || !txtDriverContact.value || !txtBusId.value) return null
+            if (!txtBatchID.value || !txtbatchName.value || !txtdate.value || !txtBatchAmount.value) return null
 
-            var id = txtDriverId.value
+            var id = txtBatchID.value
 
-            db.ref('Driver/' + id).set({
-                DriverId: txtDriverId.value,
-                DriverName: txtDriverName.value,
-                DriverNic: txtDriverNic.value,
-                DriverContact: txtDriverContact.value,
-                BusId: txtBusId.value
+            db.ref('BatchItems/' + id).set({
+                batchID: txtBatchID.value,
+                                productName: txtbatchName.value,
+                                productExp: txtdate.value,
+                                amount: txtBatchAmount.value
             });
             alert("Update Successfull");
 
-            document.getElementById("FrmDriver").reset();
+            document.getElementById("FrmProdcuts").reset();
             location.reload();
 
 
@@ -218,7 +217,7 @@
 
         var dataset = document.getElementById('dataset');
 
-        var readRef = db.ref('/Driver');
+        var readRef = db.ref('/BatchItems');
 
         readRef.on('child_added', (data) => {
 
@@ -249,32 +248,31 @@
 
                 hideSaveButton();
 
-                txtDriverId.value = dataNode.querySelector('.txtDriverId').innerText;
-                txtDriverName.value = dataNode.querySelector('.txtDriverName').innerText;
-                txtDriverNic.value = dataNode.querySelector('.txtDriverNic').innerText;
-                txtDriverContact.value = dataNode.querySelector('.txtDriverContact').innerText;
-                txtBusId.value = dataNode.querySelector('.txtBusId').innerText;
+                txtBatchID.value = dataNode.querySelector('.txtDriverId').innerText;
+                txtbatchName.value = dataNode.querySelector('.txtDriverName').innerText;
+                txtdate.value = dataNode.querySelector('.txtDriverNic').innerText;
+                txtBatchAmount.value = dataNode.querySelector('.txtDriverContact').innerText;
+        
 
             }
 
             // Delete
             if (e.target.classList.contains('delete')) {
                 var id = dataNode.id;
-                db.ref('Driver/' + id).remove();
+                db.ref('BatchItems/' + id).remove();
             }
 
         });
 
-        function dataSet({ DriverId, DriverName, DriverNic, DriverContact, BusId }) {
+        function dataSet({ batchID, productName, productExp, amount }) {
             return `
 
     
   <tr>
-    <td><div class='txtDriverId'>${DriverId}</div></td>
-    <td><div class='txtDriverName'>${DriverName}</div></td>
-    <td><div class='txtDriverNic'>${DriverNic}</div></td>
-    <td><div class='txtDriverContact'>${DriverContact}</div></td>
-    <td><div class='txtBusId'>${BusId}</div></td>
+    <td><div class='txtDriverId'>${batchID}</div></td>
+    <td><div class='txtDriverName'>${productName}</div></td>
+    <td><div class='txtDriverNic'>${productExp}</div></td>
+    <td><div class='txtDriverContact'>${amount}</div></td>
     <button class='edit'>Edit</button>
 <button class='delete'>Delete</button>
    </tr>`

@@ -1,0 +1,85 @@
+{
+  "project_info": {
+    "project_number": "695910435495",
+    "firebase_url": "https://foodtracker-baade-default-rtdb.firebaseio.com",
+    "project_id": "foodtracker-baade",
+    "storage_bucket": "foodtracker-baade.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695910435495:android:461767ab231ccbff72e982",
+        "android_client_info": {
+          "package_name": "com.nsbm.foodtracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "695910435495-ak8kc05m585vgeqh77na7dlknccppg84.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nsbm.foodtracker",
+            "certificate_hash": "4439fb7f05d5467cdfd7ef2e01b205ca0cf89123"
+          }
+        },
+        {
+          "client_id": "695910435495-143134tglmgdu2vs98556c70ie905cr2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzZ6BdW_X7o2FRzUS0UsczET9HGYxnEAo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "695910435495-05b843gp423ape6fmd6cq8i2fmhn1i56.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695910435495:android:ea26e11ac02d537972e982",
+        "android_client_info": {
+          "package_name": "com.nsbm.foodtracker_emp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "695910435495-neshjutom6p0luo7ido85racjohbr1dq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nsbm.foodtracker_emp",
+            "certificate_hash": "4439fb7f05d5467cdfd7ef2e01b205ca0cf89123"
+          }
+        },
+        {
+          "client_id": "695910435495-143134tglmgdu2vs98556c70ie905cr2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzZ6BdW_X7o2FRzUS0UsczET9HGYxnEAo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "695910435495-05b843gp423ape6fmd6cq8i2fmhn1i56.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

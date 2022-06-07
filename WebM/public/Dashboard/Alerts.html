@@ -9,11 +9,10 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-
     <title>Food Tracker: Alerts</title>
 </head>
 
-<body id="body">
+<body id="body" onload="assingID();">
     <div class="container">
         <nav class="navbar">
             <div class="nav_icon" onclick="toggleSidebar()">
@@ -42,30 +41,41 @@
             <link href="https://fonts.googleapis.com/css2?family=Mate+SC&display=swap" rel="stylesheet">
             <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
             <div class="wrapper">
-            <!--    <h2>Insert Batch of products</h2>
+                <!-- <h2>Register New Employee</h2> -->
                 <br>
-                <form id="FrmProdcuts" class="form" method="post" action="#">
-                    <input id="txtBatchID" type="text" class="productsID" placeholder="Batch number" required>
-                    <input id="txtbatchName" type="text" class="name" placeholder="Product Name"
-                        oninput="this.value = this.value.replace(/[^A-Za-z]/ig, '').replace(/(\..*)\./g, '$1');" required> -->
-                     <!--<input id="txtProductDate" type="date" class="date" required placeholder="Expire Date"> 
-                     <input type="text" placeholder="MM/DD/YYYY" onfocus="(this.type='date')">
-                    <input id="txtBatchAmount" type="text" class="amount" placeholder="Number of products" required
-                    <input id="txtBatchPrice" type="numer" class="contact" placeholder="Price of each product" step="1" required>
-                    <!--<input id="txtBusId" type="text" class="busid" placeholder="Bus ID" required>
-                    <input id="btnSave" type="submit" class="submit" value="Insert" onclick="saveProduct();">
-                    <input id="btnUpdate" type="submit" class="submit" value="Update" onclick="updateDriver();"
-                </form> -->
-            </div>
+                <form id="FrmBus" class="form" method="post" action="#" style="display: none">
 
-            <h2>Alerts</h2>
+                    <input id="txtbusid" type="text" class="busid" placeholder="Employee ID" readonly required>
+
+                    <input id="txtBusroute" type="text" class="route" placeholder="Employee Display name" required>
+
+                    <input id="txtvehiclenumber" type="text" class="vehiclenumber" placeholder="Employee Login username"
+                        required>
+
+                    <input id="txtnumofseats" type="password" class="numofseats" placeholder="Password" required>
+
+                    <input id="txtavailableseats" type="password" class="availableseats" placeholder="Confirm Password"
+                        required>
+
+
+                    <input id="btnSave" type="submit" class="submit" value="Register" onclick="saveBus();">
+
+
+                    <input id="btnUpdate" type="submit" class="submit" value="Update" onclick="updatebus();">
+
+
+                </form>
+            </div>
+            </br>
+            </br>
+
+            <h2>Products & Batch Details</h2></br></br></br>
             <table class="table table-dark text-white">
                 <thead>
-                    <th>Batch Number</th>
-                    <th>Batch Name</th>
-                    <th>Expire Date</th>
-                    <th>Number of Products remaining</th>
-                    <!--<th>Bus Id</th>-->
+                    <th>Batch No</th>
+                    <th>Item Name</th>
+                    <th>Batch Expired Date</th>
+                    <th>Amounts of products</th>
                 </thead>
 
 
@@ -73,7 +83,6 @@
 
                 </tbody>
             </table>
-
 
         </main>
 
@@ -89,121 +98,168 @@
             <!--SIDE_BAR-->
             <div class="sidebar__menu">
                 <div class="sidebar__link active_menu_link">
-                  <i class="fas fa-tachometer-alt"></i>
-                  <a href="dashboard.html">Dashboard</a>
-                </div>
-      
-                <div class="sidebar__link">
-                  <i class="fas fa-bus"></i>
-                  <a href="Products.html">Products</a>
-                </div>
-      
-                <div class="sidebar__link">
-                  <i class="fas fa-bus"></i>
-                  <a href="Batch.html">Batch</a>
-                </div>
-               
-                <div class="sidebar__link">
-                  <i class="fas fa-hand-holding-usd"></i>
-                  <a href="Employee.html">Employee</a>
-                </div>
-               
-                <div class="sidebar__link">
-                  <i class="fas fa-calendar-alt"></i>
-                  <a href="Sales.html">Sales</a>
-                </div>
-                
-                <div class="sidebar__link">
-                  <i class="fas fa-info"></i>
-                  <a href="ListProducts.html">Products List</a>
-                </div>
-
-
+                    <!-- <i class="fas fa-tachometer-alt"></i> -->
+                    <a href="dashboard.html">Dashboard</a>
+                  </div>
+          
+                  <div class="sidebar__link">
+                    <!-- <i class="fas fa-bus"></i> -->
+                    <a href="Products.html">Products</a>
+                  </div>
+          
+                  <div class="sidebar__link">
+                    <!-- <i class="fas fa-bus"></i> -->
+                    <a href="Batch.html">Batch</a>
+                  </div>
+          
+                  <div class="sidebar__link">
+                    <!-- <i class="fas fa-hand-holding-usd"></i> -->
+                    <a href="Employee.html">Employee</a>
+                  </div>
+          
+                  <div class="sidebar__link">
+                    <!-- <i class="fas fa-calendar-alt"></i> -->
+                    <a href="Alerts.html">Alerts</a>
+                  </div>
+          
+                  <div class="sidebar__link">
+                    <!-- <i class="fas fa-info"></i> -->
+                    <a href="ListProducts.html">Products List</a>
+                  </div>
 
             </div>
         </div>
     </div>
-
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/5.0.0/firebase.js"></script>
+
+
 
     <script>
         // Your web app's Firebase configuration
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         var firebaseConfig = {
             apiKey: "AIzaSyDoRq7muk0ru0kSRmOhbpGER_dd3ZHoOhY",
-          authDomain: "foodtracker-baade.firebaseapp.com",
-          databaseURL: "https://foodtracker-baade-default-rtdb.firebaseio.com",
-          projectId: "foodtracker-baade",
-          storageBucket: "foodtracker-baade.appspot.com",
-          messagingSenderId: "695910435495",
-          appId: "1:695910435495:web:c6e4cd7371bcd99b72e982",
-          measurementId: "G-B1R3K5G5W5"
+            authDomain: "foodtracker-baade.firebaseapp.com",
+            databaseURL: "https://foodtracker-baade-default-rtdb.firebaseio.com",
+            projectId: "foodtracker-baade",
+            storageBucket: "foodtracker-baade.appspot.com",
+            messagingSenderId: "695910435495",
+            appId: "1:695910435495:web:c6e4cd7371bcd99b72e982",
+            measurementId: "G-B1R3K5G5W5"
         };
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
+
         var db = firebase.database();
+        // var db = firebase.database();
 
-        var FrmProduct = document.getElementById('FrmDriver');
-        var txtDriverId = document.getElementById('txtDriverId');
-        var txtDriverName = document.getElementById('txtDriverName');
-        var txtDriverNic = document.getElementById('txtDriverNic');
-        var txtDriverContact = document.getElementById('txtDriverContact');
-        var txtBusId = document.getElementById('txtBusId');
-
-
-        function saveDriver() {
-            if (!txtDriverId.value || !txtDriverName.value || !txtDriverNic.value || !txtDriverContact.value || !txtBusId.value) return null
-
-            var id = txtDriverId.value
-
-            var dataRef = db.ref();
-            dataRef.child('Driver').orderByChild('DriverId').equalTo(id).once('value', snapshot => {
-
-                if (snapshot.exists()) {
-                    alert("Already Exists");
-                }
-
-                else {
-
-                    db.ref('Driver/' + id).set({
-                        DriverId: txtDriverId.value,
-                        DriverName: txtDriverName.value,
-                        DriverNic: txtDriverNic.value,
-                        DriverContact: txtDriverContact.value,
-                        BusId: txtBusId.value
-                    });
-                    alert("Successfull");
-                    document.getElementById("FrmDriver").reset();
+        var FrmBus = document.getElementById('FrmBus');
+        var txtbusid = document.getElementById('txtbusid');
+        var txtBusroute = document.getElementById('txtBusroute');
+        var txtvehiclenumber = document.getElementById('txtvehiclenumber');
+        var txtnumofseats = document.getElementById('txtnumofseats');
+        var txtavailableseats = document.getElementById('txtavailableseats');
 
 
-                }
+        function assingID() {
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mn1 = today.getMonth() + 2;
+            var mm = String(mn1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
 
-            });
+            today = yyyy + '-' + mm + '-' + dd;
+            //alert("today :"+today);
+
+            // var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+
+            firebase.database().ref("BatchItems").orderByChild("productExp").equalTo(today).on("value", function (snapshot) {
+                snapshot.forEach(function (data) {
+                    
+                    alert("The batch of "+ data.val().productName+ " going to Expired on "+data.val().productExp);
+                })
+            })
+
+        };
+
+        function saveBus() {
+            if (!txtbusid.value || !txtBusroute.value || !txtvehiclenumber.value || !txtnumofseats.value || !txtavailableseats.value) return null
 
 
+            else {
+
+                var id = txtvehiclenumber.value
+
+                var dataRef = db.ref();
+                dataRef.child('Employee').orderByChild('userName').equalTo(id).once('value', snapshot => {
+
+                    if (snapshot.exists()) {
+                        alert("Already Exists");
+
+                    }
+
+                    else {
+
+                        if (txtnumofseats.value == txtavailableseats.value) {
+                            var data = {
+                                employeeID: txtbusid.value,
+                                employeeName: txtBusroute.value,
+                                password: txtnumofseats.value,
+                                role: 'role',
+                                shopID: 2,
+                                userName: txtvehiclenumber.value
+                            }
+
+                            dataRef.child('Employee/' + txtvehiclenumber.value).set(data);
+
+                            // db.ref('Emplyee/' + id).set({
+                            //     BusId: txtbusid.value,
+                            //     Busroute: txtBusroute.value,
+                            //     VehicleNumber: txtvehiclenumber.value,
+                            //     NumofSeats: txtnumofseats.value,
+                            //     AvailableSeats: txtavailableseats.value
+                            // });
+                            alert("Successfull");
+                            document.getElementById("FrmBus").reset();
+
+                        }
+                        else {
+                            alert("Password not matched")
+                        }
+
+
+
+                    }
+
+
+                });
+
+            }
         }
+        function updatebus() {
+            if (!txtbusid.value || !txtBusroute.value || !txtvehiclenumber.value || !txtnumofseats.value || !txtavailableseats.value) return null
 
-        function updateDriver() {
-            if (!txtDriverId.value || !txtDriverName.value || !txtDriverNic.value || !txtDriverContact.value || !txtBusId.value) return null
+            var id = txtbusid.value
 
-            var id = txtDriverId.value
+            db.ref('Bus/' + id).set({
+                BusId: txtbusid.value,
+                Busroute: txtBusroute.value,
+                VehicleNumber: txtvehiclenumber.value,
+                NumofSeats: txtnumofseats.value,
+                AvailableSeats: txtavailableseats.value
 
-            db.ref('Driver/' + id).set({
-                DriverId: txtDriverId.value,
-                DriverName: txtDriverName.value,
-                DriverNic: txtDriverNic.value,
-                DriverContact: txtDriverContact.value,
-                BusId: txtBusId.value
+
             });
+
+
             alert("Update Successfull");
 
-            document.getElementById("FrmDriver").reset();
+            document.getElementById("FrmBus").reset();
             location.reload();
-
-
         }
+
+
 
         function hideSaveButton() {
 
@@ -218,7 +274,7 @@
 
         var dataset = document.getElementById('dataset');
 
-        var readRef = db.ref('/Driver');
+        var readRef = db.ref('/BatchItems');
 
         readRef.on('child_added', (data) => {
 
@@ -227,7 +283,6 @@
             tr.innerHTML = dataSet(data.val())
             dataset.appendChild(tr);
         });
-
         readRef.on('child_changed', (data) => {
 
             var dataNode = document.getElementById(data.key);
@@ -249,40 +304,83 @@
 
                 hideSaveButton();
 
-                txtDriverId.value = dataNode.querySelector('.txtDriverId').innerText;
-                txtDriverName.value = dataNode.querySelector('.txtDriverName').innerText;
-                txtDriverNic.value = dataNode.querySelector('.txtDriverNic').innerText;
-                txtDriverContact.value = dataNode.querySelector('.txtDriverContact').innerText;
-                txtBusId.value = dataNode.querySelector('.txtBusId').innerText;
+                txtbusid.value = dataNode.querySelector('.txtbusid').innerText;
+                txtBusroute.value = dataNode.querySelector('.txtBusroute').innerText;
+                txtvehiclenumber.value = dataNode.querySelector('.txtvehiclenumber').innerText;
+                txtnumofseats.value = dataNode.querySelector('.txtnumofseats').innerText;
+                txtavailableseats.value = dataNode.querySelector('.txtavailableseats').innerText;
 
             }
 
             // Delete
             if (e.target.classList.contains('delete')) {
                 var id = dataNode.id;
-                db.ref('Driver/' + id).remove();
+                db.ref('BatchItems/' + id).remove();
             }
 
         });
 
-        function dataSet({ DriverId, DriverName, DriverNic, DriverContact, BusId }) {
+
+        function dataSet({ batchID, productName, productExp, amount }) {
             return `
 
-    
   <tr>
-    <td><div class='txtDriverId'>${DriverId}</div></td>
-    <td><div class='txtDriverName'>${DriverName}</div></td>
-    <td><div class='txtDriverNic'>${DriverNic}</div></td>
-    <td><div class='txtDriverContact'>${DriverContact}</div></td>
-    <td><div class='txtBusId'>${BusId}</div></td>
-    <button class='edit'>Edit</button>
-<button class='delete'>Delete</button>
+    <td><div class='txtbusid'>${batchID}</div></td>
+    <td><div class='txtBusroute'>${productName}</div></td>
+    <td><div class='txtvehiclenumber'>${productExp}</div></td>
+    <td><div class='txtvehiclenumber'>${amount}</div></td>
+    <button class='delete'>Delete</button>
    </tr>`
+
+
+
 
         }
 
 
+
+     //<button class='edit'>Edit</button> 
+
+
+        /*FrmBus.addEventListener('submit', (e) => {
+          e.preventDefault();
+        
+          if (!txtbusid.value || !txtBusroute.value || !txtvehiclenumber.value|| !txtnumofseats.value || !txtavailableseats.value) return null
+        
+          //var id=txtDriverId
+        
+              db.ref('Bus/').child( txtbusid.value).set({
+              BusId: txtbusid.value,
+              Busroute: txtBusroute.value,
+              VehicleNumber: txtvehiclenumber.value,
+              NumofSeats: txtnumofseats.value,
+              AvailableSeats: txtavailableseats.value
+          });
+        
+          document.getElementById("FrmBus").reset();
+          
+          location.reload();  
+              
+        
+          });*/
+
+
+
+
+
+
+
+
+
+
     </script>
+
+    <!-- <script>
+      window.ub.form.validationMessages.txtbusid.required = 'You forgot to enter your Bus Id!';
+   </script> -->
+
+
+    <!-- <script type="text/javascript" src="jquery.min.js"></script> -->
     <script src="../js/dashboard.js"></script>
 </body>
 

@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-
-    <title>Food Tracker: Batch</title>
+    <title>Food Tracker: Products</title>
 </head>
 
 <body id="body">
@@ -42,30 +41,43 @@
             <link href="https://fonts.googleapis.com/css2?family=Mate+SC&display=swap" rel="stylesheet">
             <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
             <div class="wrapper">
-            <!--    <h2>Insert Batch of products</h2>
-                <br>
-                <form id="FrmProdcuts" class="form" method="post" action="#">
-                    <input id="txtBatchID" type="text" class="productsID" placeholder="Batch number" required>
-                    <input id="txtbatchName" type="text" class="name" placeholder="Product Name"
-                        oninput="this.value = this.value.replace(/[^A-Za-z]/ig, '').replace(/(\..*)\./g, '$1');" required> -->
-                     <!--<input id="txtProductDate" type="date" class="date" required placeholder="Expire Date"> 
-                     <input type="text" placeholder="MM/DD/YYYY" onfocus="(this.type='date')">
-                    <input id="txtBatchAmount" type="text" class="amount" placeholder="Number of products" required
-                    <input id="txtBatchPrice" type="numer" class="contact" placeholder="Price of each product" step="1" required>
-                    <!--<input id="txtBusId" type="text" class="busid" placeholder="Bus ID" required>
-                    <input id="btnSave" type="submit" class="submit" value="Insert" onclick="saveProduct();">
-                    <input id="btnUpdate" type="submit" class="submit" value="Update" onclick="updateDriver();"
-                </form> -->
-            </div>
+            </br></br>
+            
 
-            <h2>Batch Details</h2>
+                <!-- <h2>Register New Employee</h2> -->
+                <br>
+                <form id="FrmBus" class="form" method="post" action="#" style="display: none">
+
+                    <input id="txtbusid" type="text" class="busid" placeholder="Employee ID" readonly required>
+
+                    <input id="txtBusroute" type="text" class="route" placeholder="Employee Display name" required>
+
+                    <input id="txtvehiclenumber" type="text" class="vehiclenumber" placeholder="Employee Login username"
+                        required>
+
+                    <input id="txtnumofseats" type="password" class="numofseats" placeholder="Password" required>
+
+                    <input id="txtavailableseats" type="password" class="availableseats" placeholder="Confirm Password"
+                        required>
+
+
+                    <input id="btnSave" type="submit" class="submit" value="Register" onclick="saveBus();">
+
+
+                    <input id="btnUpdate" type="submit" class="submit" value="Update" onclick="updatebus();">
+
+
+                </form>
+            </div>
+            </br>
+            </br>
+
+            <h2>Products Details</h2></br></br></br>
             <table class="table table-dark text-white">
                 <thead>
-                    <th>Batch Number</th>
-                    <th>Batch Name</th>
-                    <th>Expire Date</th>
-                    <th>Number of Products</th>
-                    <!--<th>Bus Id</th>-->
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Product Price</th>
                 </thead>
 
 
@@ -74,14 +86,13 @@
                 </tbody>
             </table>
 
-
         </main>
 
         <div id="sidebar">
             <div class="sidebar__title">
                 <div class="sidebar__img">
-                    <img src="../assets/farmer.svg" alt="logo" />
-                    <h1>&nbsp;&nbsp; Administrator</h1>
+                    <img src="../assets/logo.png" alt="logo" />
+                    <h1>&nbsp;&nbsp; Food Tracker</h1>
                 </div>
                 <i onclick="closeSidebar()" class="fa fa-times" id="sidebarIcon" aria-hidden="true"></i>
             </div>
@@ -89,121 +100,66 @@
             <!--SIDE_BAR-->
             <div class="sidebar__menu">
                 <div class="sidebar__link active_menu_link">
-                  <i class="fas fa-tachometer-alt"></i>
+                  <!-- <i class="fas fa-tachometer-alt"></i> -->
                   <a href="dashboard.html">Dashboard</a>
                 </div>
-      
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-bus"></i>
+                  <!-- <i class="fas fa-bus"></i> -->
                   <a href="Products.html">Products</a>
                 </div>
-      
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-bus"></i>
+                  <!-- <i class="fas fa-bus"></i> -->
                   <a href="Batch.html">Batch</a>
                 </div>
-               
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-hand-holding-usd"></i>
+                  <!-- <i class="fas fa-hand-holding-usd"></i> -->
                   <a href="Employee.html">Employee</a>
                 </div>
-               
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-calendar-alt"></i>
-                  <a href="Sales.html">Sales</a>
+                  <!-- <i class="fas fa-calendar-alt"></i> -->
+                  <a href="Alerts.html">Alerts</a>
                 </div>
-                
+        
                 <div class="sidebar__link">
-                  <i class="fas fa-info"></i>
+                  <!-- <i class="fas fa-info"></i> -->
                   <a href="ListProducts.html">Products List</a>
                 </div>
-
-
 
             </div>
         </div>
     </div>
-
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/5.0.0/firebase.js"></script>
+
+
 
     <script>
         // Your web app's Firebase configuration
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         var firebaseConfig = {
             apiKey: "AIzaSyDoRq7muk0ru0kSRmOhbpGER_dd3ZHoOhY",
-          authDomain: "foodtracker-baade.firebaseapp.com",
-          databaseURL: "https://foodtracker-baade-default-rtdb.firebaseio.com",
-          projectId: "foodtracker-baade",
-          storageBucket: "foodtracker-baade.appspot.com",
-          messagingSenderId: "695910435495",
-          appId: "1:695910435495:web:c6e4cd7371bcd99b72e982",
-          measurementId: "G-B1R3K5G5W5"
+            authDomain: "foodtracker-baade.firebaseapp.com",
+            databaseURL: "https://foodtracker-baade-default-rtdb.firebaseio.com",
+            projectId: "foodtracker-baade",
+            storageBucket: "foodtracker-baade.appspot.com",
+            messagingSenderId: "695910435495",
+            appId: "1:695910435495:web:c6e4cd7371bcd99b72e982",
+            measurementId: "G-B1R3K5G5W5"
         };
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
+
         var db = firebase.database();
+        // var db = firebase.database();
 
-        var FrmProduct = document.getElementById('FrmDriver');
-        var txtDriverId = document.getElementById('txtDriverId');
-        var txtDriverName = document.getElementById('txtDriverName');
-        var txtDriverNic = document.getElementById('txtDriverNic');
-        var txtDriverContact = document.getElementById('txtDriverContact');
-        var txtBusId = document.getElementById('txtBusId');
+        var searchProduct = document.getElementById('searchProduct');
+        var btnSearch = document.getElementById('btnSearch');
+        var dataset = document.getElementById('dataset');
 
-
-        function saveDriver() {
-            if (!txtDriverId.value || !txtDriverName.value || !txtDriverNic.value || !txtDriverContact.value || !txtBusId.value) return null
-
-            var id = txtDriverId.value
-
-            var dataRef = db.ref();
-            dataRef.child('Driver').orderByChild('DriverId').equalTo(id).once('value', snapshot => {
-
-                if (snapshot.exists()) {
-                    alert("Already Exists");
-                }
-
-                else {
-
-                    db.ref('Driver/' + id).set({
-                        DriverId: txtDriverId.value,
-                        DriverName: txtDriverName.value,
-                        DriverNic: txtDriverNic.value,
-                        DriverContact: txtDriverContact.value,
-                        BusId: txtBusId.value
-                    });
-                    alert("Successfull");
-                    document.getElementById("FrmDriver").reset();
-
-
-                }
-
-            });
-
-
-        }
-
-        function updateDriver() {
-            if (!txtDriverId.value || !txtDriverName.value || !txtDriverNic.value || !txtDriverContact.value || !txtBusId.value) return null
-
-            var id = txtDriverId.value
-
-            db.ref('Driver/' + id).set({
-                DriverId: txtDriverId.value,
-                DriverName: txtDriverName.value,
-                DriverNic: txtDriverNic.value,
-                DriverContact: txtDriverContact.value,
-                BusId: txtBusId.value
-            });
-            alert("Update Successfull");
-
-            document.getElementById("FrmDriver").reset();
-            location.reload();
-
-
-        }
 
         function hideSaveButton() {
 
@@ -212,13 +168,8 @@
         }
         document.getElementById("btnUpdate").style.display = "none";
 
-
-
-
-
         var dataset = document.getElementById('dataset');
-
-        var readRef = db.ref('/Driver');
+        var readRef = db.ref('/Products');
 
         readRef.on('child_added', (data) => {
 
@@ -227,7 +178,6 @@
             tr.innerHTML = dataSet(data.val())
             dataset.appendChild(tr);
         });
-
         readRef.on('child_changed', (data) => {
 
             var dataNode = document.getElementById(data.key);
@@ -246,43 +196,32 @@
             var dataNode = e.target.parentNode
             // Update
             if (e.target.classList.contains('edit')) {
-
                 hideSaveButton();
-
-                txtDriverId.value = dataNode.querySelector('.txtDriverId').innerText;
-                txtDriverName.value = dataNode.querySelector('.txtDriverName').innerText;
-                txtDriverNic.value = dataNode.querySelector('.txtDriverNic').innerText;
-                txtDriverContact.value = dataNode.querySelector('.txtDriverContact').innerText;
-                txtBusId.value = dataNode.querySelector('.txtBusId').innerText;
-
             }
 
             // Delete
             if (e.target.classList.contains('delete')) {
                 var id = dataNode.id;
-                db.ref('Driver/' + id).remove();
+                db.ref('Products/' + id).remove();
             }
 
         });
 
-        function dataSet({ DriverId, DriverName, DriverNic, DriverContact, BusId }) {
+
+        function dataSet({ ProductID, ProductName, ProductPrice }) {
             return `
 
-    
-  <tr>
-    <td><div class='txtDriverId'>${DriverId}</div></td>
-    <td><div class='txtDriverName'>${DriverName}</div></td>
-    <td><div class='txtDriverNic'>${DriverNic}</div></td>
-    <td><div class='txtDriverContact'>${DriverContact}</div></td>
-    <td><div class='txtBusId'>${BusId}</div></td>
-    <button class='edit'>Edit</button>
-<button class='delete'>Delete</button>
-   </tr>`
+            <tr>
+            <td><div class='txtbusid'>${ProductID}</div></td>
+            <td><div class='txtBusroute'>${ProductName}</div></td>
+            <td><div class='txtvehiclenumber'>${ProductPrice}</div></td>
+            <button class='delete'>Delete</button>
+            </tr>`
 
         }
 
-
     </script>
+
     <script src="../js/dashboard.js"></script>
 </body>
 
