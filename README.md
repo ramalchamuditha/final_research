@@ -1,4 +1,4 @@
-# final_research
+# Food Tracker 
 
 Food tracker is an application solution for the customers as well as the shop owners. This
 solution can be used as a food management and food tracker for the customers and for the shop
